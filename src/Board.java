@@ -24,23 +24,21 @@ import java.util.Set;
  *  
  */
 public class Board {
-	private List<Character> letters;
-	
-	//variables assigned after solution is set
-	private int totalWords;						
+	private List<Character> letters; //the faces on the current board	
 	private Map<List<Integer>,String> solution;	//index paths and corresponding words
 	private List<String> uniqueWords;			//list of all unique words
-	
+    private int size;	
 	
 	//Constructs a Board with random initialization
-	public Board() {
-		this.letters = generate();
+	public Board(int size) {
+		this.letters = generate(size);
 		this.uniqueWords = null;
 		this.solution = null;
-		this.totalWords = 0;
+        this.size = size;
 	}
 	
 	//Constructs a board from a a set of letters
+    //old cons , needs to be redone
 	public Board(String boardString) {
 		letters = new ArrayList<Character>();
 		int stringLength = boardString.length();
@@ -49,7 +47,7 @@ public class Board {
 		}
 		this.uniqueWords = null;
 		this.solution = null;
-		this.totalWords = 0;
+        this.size = 4;
 	}
 	
 	//returns the Letters list of the board
@@ -59,6 +57,7 @@ public class Board {
 	
 
 	//print the board in a 4x4 grid
+    //old print needs to be redone ..
 	public void printBoard(){
 		String result = "";
 		for (int i = 0; i < 4; i++) {
@@ -71,14 +70,76 @@ public class Board {
 		}
 		System.out.println(result);
 	}
-	
+
+    public void prettyPrintBoard(){
+        String topBase =  "┌────";
+        String midBase =   "| ──┼"; 
+        String botBase =  "└────";
+        
+
+     
+        String midExtend = "───┼";
+        String Extend    = "────";
+        
+        String topEnd =  "───┐";
+        String midEnd =   "── |"; 
+        String botEnd =  "───┘";
+
+        int extension = this.size - 2; 
+        String top = topBase;
+        String mid = midBase;
+        String bot = botBase;
+        for (int i =0; i < extension; i++){
+            top += Extend;
+            mid += midExtend;
+            bot += Extend;
+        }
+        top+=topEnd;
+        mid+=midEnd;
+        bot+=botEnd;
+        //String top =   "┌───────────────┐";
+        //String mid = "| ──┼───┼───┼── |";
+        //String bot =   "└───────────────┘"; 
+
+        System.out.println("size " + this.size); 
+        String board = "" + top;
+        for (int i = 0; i < this.size; i++) {
+
+            String rowString = "|";
+            for (int j = 0; j < this.size; j++) { 
+                String let = Character.toString(letters.get((i*this.size)+j));
+                if (let.equals("q")) {
+                    rowString+=" Qu";
+                }
+                else{
+                    rowString+=" ";
+                    rowString+=let;
+                    rowString+=" ";
+                }
+                if (i!=0 || i!=this.size-1){
+                    rowString+="|";
+                }
+            }
+            board+="\n";
+            board+=rowString;
+            board+="\n";
+            if (i!=this.size -1){
+                board+=mid;
+            }
+        
+        }
+        board+=bot;
+        System.out.println(board);
+    }
+
+    //remove	
 	//assigns the board a solution and creates a the unique words list
 	public void setSolution(Map<List<Integer>,String> solution) {
 		this.solution = solution;
 		createUniqueWords();
 	}
 	
-	
+    //move to BoardSolver
 	/**@precondition setSolution has been called
 	 */
 	public void printUniqueWords() {
@@ -86,7 +147,8 @@ public class Board {
 			System.out.println(s);
 		}
 	}
-	
+
+    //remove	
 	/**@precondition setSolution has been called
 	 */
 	public List<String> getUniqueWords(){
@@ -107,10 +169,9 @@ public class Board {
 	
 	
 	//return a list of characters that encode the boggle instance
-	private List<Character> generate(){
-		Random rand = new Random();
-		List<Character> letters = new ArrayList<Character>();
-		List<String> dice = 
+	private List<Character> generate(int size){
+		        //4x4 boggle
+		List<String> original = 
 			Arrays.asList(
 							"aocsph",
 							"aeange",
@@ -129,27 +190,95 @@ public class Board {
 							"miqnuh",
 							"znrnhl"
 										);
+        //5x5 boggle
+        List<String> big = 
+            Arrays.asList(
+                            "qbzjxk",
+                            "touoto",
+                            "ovwrgr",
+                            "aaafsr",
+                            "aumeeg",
+                            "hhlrdo",
+                            "nhdthc",
+                            "lhnrod",
+                            "afaisr",
+                            "yifasr",
+                            "telpci",
+                            "ssnseu",
+                            "riyprh",
+                            "dordln",
+                            "ccwnst",
+                            "ttotem",
+                            "sctiep",
+                            "eandnn",
+                            "mnneag",
+                            "uotown",
+                            "aeaeee",
+                            "yifpsr",
+                            "eeeema",
+                            "ititie",
+                            "etilic"
+                                            );
+        List<String> dice = new ArrayList<String>();
+        switch(size) {
+            case 4:
+                dice = original;
+                break;
+            case 5:
+                dice = big; 
+                break;
+            case 6:
+                break;
+            default:
+                if (size < 4) {
+                    System.out.println("Error Boggle Boards must be atleast size 4");
+                } else {
+                    dice = extendedDice(size);
+                }
+                break;
+        }
+
+        Random rand = new Random();
+		List<Character> letters = new ArrayList<Character>();
+
 		//Roll the Dice: For each die, pick one of the six faces at random
-		for(int i = 0; i < 16; i++) {
+		for(int i = 0; i < dice.size(); i++) {
 			letters.add(dice.get(i).charAt(rand.nextInt(6)));
 		}
 		
 		//Permute Faces: randomize position of selected faces
-		int size = letters.size();
+        //size is used here , this might be an issue...
 		int idx1;
 		int idx2;
 		char c;
 		for ( int i = 0; i < letters.size(); i++) {
 			idx1 = i;
-			idx2 = (rand.nextInt(size-i)+i);
+			idx2 = (rand.nextInt(letters.size()-i)+i);
 			c = letters.get(idx1);
 			letters.set(idx1, letters.get(idx2));
 			letters.set(idx2, c);
 		}
 		return letters;
 	}
+
+    //when boards requested are bigger than actual boggle boards,
+    //generate the amount dice required to construct a board
+    private List<String> extendedDice(int boardSize){
+       int diecount = (int) Math.pow(boardSize,2);
+       List<String> dice = new ArrayList<String>(); 
+       for ( int i = 0; i < diecount; i++) {
+            String die = "";
+            for (int j = 0; j < 6; j++ ) {
+                Random rand = new Random();
+                //lowercase Ascii [97,122]
+                die+= Character.toString( (char) rand.nextInt(26)+97);
+            }
+            dice.add(die);
+       } 
+       return dice;
+    }
 	
-	
+    //move .. 	
 	//sorts through the solution space and creates a list of unique words
 	private void createUniqueWords() {
 		uniqueWords = new ArrayList<String>();

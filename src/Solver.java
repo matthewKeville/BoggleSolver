@@ -6,7 +6,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Collections;
+import java.util.Set;
+import java.util.Iterator;
 
 /**
  * @author matthewkeville
@@ -37,8 +39,8 @@ import java.util.Map;
  */
 public class Solver {
 	private String wordFilePath;
-	private List<String> words;
-	private BufferedReader reader;
+	private List<String> words;//what is this
+    private List<String> uniqueWords;
 	private List<Character> letters;	//the letter the current board
 	private Map solution;			//a map of all of the valid boggle paths and there resultant strings
 
@@ -46,6 +48,7 @@ public class Solver {
 		this.letters = new ArrayList<Character>();
 		this.wordFilePath = wordFilePath;
 		this.words = new ArrayList<String>();
+        this.uniqueWords = new ArrayList<String>();
 		this.solution = new HashMap<List<Integer>,String>();	// a map that holds paths and strings
 		loadWordsFromFile();
 	}
@@ -91,8 +94,24 @@ public class Solver {
 		
 		return solution;
 	}
-	
-	
+
+    public List<String> createUniqueWords() {
+        uniqueWords = new ArrayList<String>();
+        Set keys = solution.keySet();
+        Iterator keyIterator = keys.iterator();
+        while(keyIterator.hasNext()) {
+            List<Integer> path = (List<Integer>) keyIterator.next();
+            String tmp = (String) solution.get(path);
+            if (!uniqueWords.contains(tmp)) {
+                uniqueWords.add(tmp);
+            }
+        }
+        //sort the unique words
+        Collections.sort(uniqueWords);
+        System.out.println("there are " + uniqueWords.size() + " Unique Words");
+        return uniqueWords; 
+    
+    }   
 	
 	//given a numerical position on the board, find all possible boggle Paths that start with that position
 	//return a list with 2 List<List<Integer>> which is frontier and closed
@@ -190,7 +209,7 @@ public class Solver {
 	//into the List words
 	private void loadWordsFromFile() {
 		try {
-			reader = new BufferedReader(new FileReader(wordFilePath));
+			BufferedReader reader = new BufferedReader(new FileReader(wordFilePath));
 			String line = reader.readLine();
 			while (line != null) {
 				//store the current line
@@ -289,10 +308,7 @@ public class Solver {
 		int index = binaryPartialStringSearch(pathString,0,words.size()-1);
 		return (index!=-1)?true:false;
 	}
-	
-	
-	
-	
+		
 	//ensures the words are atleast 3 letters long
 	public boolean isLegalWord(String word) {
 		return (word.length()>2)?true:false;
