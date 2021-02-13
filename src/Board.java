@@ -71,7 +71,7 @@ public class Board {
 		System.out.println(result);
 	}
 
-    public void prettyPrintBoard(){
+    public String prettyBoardString(){
         String topBase =  "┌────";
         String midBase =   "| ──┼"; 
         String botBase =  "└────";
@@ -129,7 +129,51 @@ public class Board {
         
         }
         board+=bot;
-        System.out.println(board);
+        return board;
+    }
+
+    //rotate the board 90 degrees clockwise/
+    // l00 l01 l02
+    // l03 l10 l04
+    // l05 l06 l07
+    //each board has i innner layers, in which we make 4 substitutions
+    //this is probably a bad solution...
+    //but it works
+    // there are size // 2 inner layers with more than 1 element
+    //those we swap the 4 sides for as many inner layers as there are
+    //we load each side into a buffer and then swap
+    public void rotate() {
+        // integer division is the number of inner layers that need to rotate
+        int innerRotations = size /  2;
+        char[] swapNorth = new char[size];
+        char[] swapEast = new char[size];
+        char[] swapSouth = new char[size];
+        char[] swapWest = new char[size];
+
+        //for each layer
+        for (int i=0; i < innerRotations; i++) { 
+            //fill swap buffer
+            System.out.println("\n Layer" + i);
+            for (int k=0; k < size-(i*2); k++) {
+                swapNorth[k] = letters.get(i+(i*size)+k);
+                swapEast[k] = letters.get( (size-1)*(i+1)+size*k );
+                swapSouth[k] = letters.get( (size-i)*size-(1+i)-k);
+                swapWest[k] =  letters.get( (size-1)*(size-i)-(size*k));
+
+            }
+            //System.out.println("North" + Arrays.toString(swapNorth)); 
+            //System.out.println("East" + Arrays.toString(swapEast)); 
+            //System.out.println("South" + Arrays.toString(swapSouth));  
+            //System.out.println("West" + Arrays.toString(swapWest)); 
+
+            //put North in East, East in South ...
+            for (int k=0; k < size-(i*2); k++) {
+                letters.set((size-1)*(i+1)+size*k,swapNorth[k]); //put North in East
+                letters.set( (size-i)*size-(1+i)-k,swapEast[k]); //put East in South
+                letters.set( (size-1)*(size-i)-(size*k),swapSouth[k]); //put South in West
+                letters.set(i+(i*size)+k,swapWest[k]);
+            }
+        }
     }
 
     //remove	

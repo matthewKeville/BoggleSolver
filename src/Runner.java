@@ -3,6 +3,7 @@ import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.IOException;
+import java.util.Arrays;
 public class Runner {
 
     private static Board board;
@@ -13,24 +14,34 @@ public class Runner {
     private static int size = 4;
     private static long timeStart = System.currentTimeMillis();
     private static int durationInSeconds = 30;
-    private static int duration = 1000*durationInSeconds;
+    private static int duration = 1000*durationInSeconds;    
+    private final static int maxSize = 30;
+    private final static int minSize = 4;
 
     //clear the terminal 
     public static void clrScreen(){
         System.out.println("\033\143");
     } 
 
-    public static void printHelp(){
-        System.out.println("[h] Print this menu");
-        System.out.println("[b] Return to the board");
-        System.out.println("[s] Print out the solutions");
-        System.out.println("[r] Randomize the board");
-        System.out.println("[t] Enter timed mode ");
-        System.out.println("[c] change board size");
-        System.out.println("[q] Quit");
-        
-    }
+    //given a list of valid response strings 
+    //query user input until a valid response is given by the user
+    //and return the valid response
+    public static String queryResponse(List<String> responses,String options) {
+        clrScreen();
+        System.out.println(options);
+        Scanner scan = new Scanner(System.in);
+        String ans = scan.next();
+        while (!responses.contains(ans)) {
+            clrScreen();
+            System.out.println("Invalid Option");
+            System.out.println("Please Select one below");
+            System.out.println(options);
+            ans = scan.next().substring(0,1);
+        }
+        return ans;
 
+    }
+    
     //randomize the boggle board and solve it
     public static void shakeAndSolve(int size){
         board = new Board(size);	
@@ -39,6 +50,7 @@ public class Runner {
     }
     
     public static void renderPlayScreen() {
+        String header = "[1] rotate left\t [2] rotate right\t[3] check time\t[4] quit";
         String body = "Words Found\n --------------\n";
         Iterator i = (Iterator) userWords.iterator();
         while (i.hasNext()){
@@ -46,7 +58,8 @@ public class Runner {
         }
 
         clrScreen();
-        board.prettyPrintBoard();
+        System.out.println(header);
+        System.out.println(board.prettyBoardString());
         System.out.println(body);
     
     }
@@ -85,15 +98,49 @@ public class Runner {
                     break;
             }
         }
-        
-        clrScreen(); 
-        board.prettyPrintBoard();
-        System.out.println("Game Over");
-        System.out.printf("Your Score : %d%n",score);
         double percent =  (double) userWords.size() / (double) solution.size();
+        clrScreen(); 
+        System.out.println(board.prettyBoardString());
+        System.out.println("Game Over");
+        System.out.printf("Your Score : %d%n",score);        
         System.out.printf("Percent Of Words Found :  %.2f",percent);
         System.out.println(body);
+        System.out.println("Press enter to continue");
+        Scanner scan = new Scanner(System.in);
+        scan.nextLine();
     }
+
+    //todo
+    //this method will return the list of plurizations missed by the user
+    //hard because there is more than one formula for pluralization
+    // s , es, , ies, ous, 
+    public static List<String> missedPlurals(List<String> user, List<String> solution) {
+        List<String> missed = new ArrayList<String>();
+        return missed;
+    }
+    
+    //todo
+    public static List<String> missedSuper(List<String> user, List<String> solution) {
+        List<String> missed = new ArrayList<String>();
+        for (String w : userWords) {
+            String miss = "";
+            for (String s : solution) {
+                if (1==0) {
+                    
+                }
+            }
+        }
+        return missed;
+
+    }
+
+    //todo
+    public static List<String> missedSubs(List<String> user, List<String> solution) {
+        List<String> missed = new ArrayList<String>();
+        return missed;
+    }
+
+
     
 	public static void main(String[] args) {
         //setupt solver
@@ -101,21 +148,22 @@ public class Runner {
 		boardSolver = new Solver(filePATH);	
         //create and solve new board
         shakeAndSolve(size); 
-		//Board board = new Board("hefodeilwvacstql"); //supposed best 4x4 from online post
 			
         Scanner scan = new Scanner(System.in);
         boolean running = true;
-
-        List options = new ArrayList<String>();	
-
-        printHelp();
         while(running){ 
-                        //dev / free mode
+            //free mode
             if (mode==0) {
-                //next reads in newest token, but we only want the first character
-                String choice = scan.next().substring(0,1);
-                clrScreen();
-                    switch(choice) {
+                List<String> mainResponses = Arrays.asList(new String[]{"q","s","r","t","c","p"});
+                String query =  board.prettyBoardString() + "\n" +  
+                                "[s] Print out the solutions\n" +
+                                "[r] Randomize the board\n" +
+                                "[t] Enter timed mode \n" +
+                                "[c] change board size\n" +
+                                "[q] Quit\n" +
+                                "[p] rotate";
+                String choice = queryResponse(mainResponses,query);
+                switch(choice) {
                         case "q":
                             System.exit(0);
                             break;
@@ -123,65 +171,105 @@ public class Runner {
                             for (String s : solution) {
                                     System.out.println(s);
                             }
-                            break;
-                        case "h":
-                            printHelp();
-                            break;
-                        case "b": 
-                            board.prettyPrintBoard();
+                            System.out.println("Enter to return to board");
+                            scan.nextLine();
                             break;
                         case "r":
                             shakeAndSolve(size);
-                            board.prettyPrintBoard();
+                            System.out.println(board.prettyBoardString());
                             break;
                         case "t":
                             mode = 1;
-                            System.out.println("You have entered timed mode" +
-                                "\n Press Enter to begin!");
-                            shakeAndSolve(size);
-                            scan.nextLine(); //eat a newline
-                        case "c":
-                            System.out.println("Pick the new board size:" +
-                                "\n[4] 4x4 Original \n[5] 5x5 Big");
-                            
-                            int newSize = scan.nextInt();
-                            clrScreen();
-                            while (newSize < 4 && newSize > 6) {
-                                System.out.println("Invalide Size");
-                                System.out.println("Please Enter an Integer between [4,6]");
-                                newSize = scan.nextInt();
-                                clrScreen();
-                            }
-                            System.out.println("Board size set to " + newSize);
-                            size = newSize; 
-                            shakeAndSolve(size);
-                            board.prettyPrintBoard();
                             break;
-                    }
-            //timed mode -> Upon enter, show rules
-            //all input is interpreted as word  submissions until time runs out
-            }else{
-                timeStart = System.currentTimeMillis();
-                while (System.currentTimeMillis() - timeStart < duration) {
-                    String ans = scan.nextLine();
-                    if (System.currentTimeMillis() - timeStart < duration) {
-                            if (solution.contains(ans) && !userWords.contains(ans)){
-                                userWords.add(ans);     
-                                System.out.println("Nice : added " + ans);                   
-                            } else {
-                                System.out.println("Not a word");
+                        case "c":
+                            List<String> sizeResponses = new ArrayList<String>();
+                            for (int i=0; i < maxSize-minSize; i++){
+                                sizeResponses.add(""+(i+minSize));
                             }
-                            renderPlayScreen();
-                    }
-                }
-                renderEndGame();
-                mode = 0;
+
+                            String sizeQuery = "Pick the new board size" +
+                                           "[4] 4x4 Original \n" +
+                                           "[5] 5x5 Big      \n" +
+                                           "[6] 6x6 Xtra     \n" +
+                                           "[n] nxn where " + minSize + " < n < " + maxSize;
+                            String newSize = queryResponse(sizeResponses,sizeQuery); 
+                            System.out.println("Board size set to " + newSize);
+                            size = Integer.parseInt(newSize); 
+                            shakeAndSolve(size);
+                            System.out.println(board.prettyBoardString());
+                            break;
+                        case "p":
+                            board.rotate();
+                            break;
             }
 
+            //timed mode
+            }else{
+                shakeAndSolve(size);
+                List<String> timedResponses = Arrays.asList(new String[]{"s","r","f"});
+                String timedQuery =  "You have entered timed mode\n" +
+                                     "Current Board Density : " + solution.size() + "\n" +
+                                     "[s] Start\n" +
+                                     "[r] Randomize the board\n" +
+                                     "[f] Return to free mode\n";
+                String timedChoice = queryResponse(timedResponses,timedQuery);
+                switch(timedChoice){
+                    case "s":
+                        boolean play = true;
+                        userWords.clear();
+                        timeStart = System.currentTimeMillis();
+                        renderPlayScreen();
+                        while (System.currentTimeMillis() - timeStart < duration && play) {
+                            String ans = scan.nextLine();
+                            //if ans is numeric than its using the menu
+                            if (ans.matches("[1-9]")) {
+                                switch(ans){
+                                    case "1":
+                                        board.rotate();
+                                        renderPlayScreen();
+                                        break;
+                                    case "2":
+                                        board.rotate();
+                                        board.rotate();
+                                        board.rotate();
+                                        renderPlayScreen();
+                                        break;
+                                    case "3":
+                                        //....
+                                        break;
+                                    case "4":
+                                        play = false;
+                                        break;
+                                }
+                                        
+                            }
+                            else if (System.currentTimeMillis() - timeStart < duration) {
+
+                                    if (solution.contains(ans) && !userWords.contains(ans)){
+                                        userWords.add(ans);     
+                                        System.out.println("Nice : added " + ans);                   
+                                    } else {
+                                        System.out.println("Not a word");
+                                    }
+                                    renderPlayScreen();
+                            }
+                            else {
+                            }
+                        }
+                        renderEndGame();
+                        break;
+                    case "r":
+                        shakeAndSolve(size);
+                        break;
+                    case "f":
+                        mode=0;
+                        break; 
+              } 
+                
+            }
     
         }
 	 
 	}
-
     
 }

@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Collections;
 import java.util.Set;
 import java.util.Iterator;
-
 /**
  * @author matthewkeville
  * 
@@ -74,15 +73,17 @@ public class Solver {
 		
 		//apply board instance to the solver
 		this.letters = board.getLetters();
+        int numDice = letters.size();
+        int sideLength = (int) Math.sqrt(numDice);
 	
 		//solve the board
 		List frontier = 	new ArrayList<List<Integer>>();
-		for (int i = 0; i < 16; i ++) {
+		for (int i = 0; i < numDice; i ++) {
 			frontier.add( new ArrayList<Integer>  (Arrays.asList(i)) );
 		}
 		
 		List closed =	 new ArrayList<List<Integer>>();
-		List<List<List<Integer>>> result = bogglePath(frontier,closed);
+		List<List<List<Integer>>> result = bogglePath(frontier,closed,sideLength);
 		List<List<Integer>> wordPaths = result.get(1);
 		
 		for(List<Integer> L :wordPaths) {
@@ -115,7 +116,7 @@ public class Solver {
 	
 	//given a numerical position on the board, find all possible boggle Paths that start with that position
 	//return a list with 2 List<List<Integer>> which is frontier and closed
-	public List<List<List<Integer>>> bogglePath(List<List<Integer>> frontier,List<List<Integer>> closed) {
+	public List<List<List<Integer>>> bogglePath(List<List<Integer>> frontier,List<List<Integer>> closed,int sideLength) {
 		
 		List<List<Integer>> newFrontier = new ArrayList<List<Integer>>();
 		
@@ -123,7 +124,7 @@ public class Solver {
 		for (List<Integer> path : frontier) {
 			
 			//check the possible physical neighbors for the leading index of the current path
-			List<Integer> neighbors = getNeighbors(path);
+			List<Integer> neighbors = getNeighbors(path,sideLength);
 			
 			//construct the neighboring paths
 			List<List<Integer>> neighborPaths = new ArrayList<List<Integer>>();
@@ -145,7 +146,7 @@ public class Solver {
 		}
 		
 		if(newFrontier.size()!=0) {						//recursive case
-			return bogglePath(newFrontier,closed);
+			return bogglePath(newFrontier,closed,sideLength);
 		}else{											//base case
 			List<List<List<Integer>>> end = new ArrayList<List<List<Integer>>>();
 			end.add(newFrontier);
@@ -156,49 +157,50 @@ public class Solver {
 	}
 	
 	//return the valid neighbors of the path
-	public List<Integer> getNeighbors(List<Integer> path) {
+	public List<Integer> getNeighbors(List<Integer> path,int sideLength) {
 		int pathLength = path.size();
 		int head = path.get(pathLength-1);
 		List<Integer> neighborList = new ArrayList<Integer>();
-		neighborList.add(head+1);
-		neighborList.add(head-3);
-		neighborList.add(head-4);
-		neighborList.add(head-5);
-		neighborList.add(head-1);
-		neighborList.add(head+3);
-		neighborList.add(head+4);
-		neighborList.add(head+5);
+		neighborList.add(head-1);//left
+		neighborList.add(head-(sideLength+1));//top left
+		neighborList.add(head-(sideLength-1));//top right
+		neighborList.add(head-sideLength);//top
+		neighborList.add(head+1);//right
+		neighborList.add(head+(sideLength+1));//bot right
+		neighborList.add(head+(sideLength-1));//bot left
+		neighborList.add(head+sideLength);//bot
 		
 
 		//remove the neighbors that 
 		//are physically invalid 
 		//( not in bounds or tile already used)
-		
+	    // -size : up  +size : down
+        // +1 : right -1 :  left	
 		
 		//remove top dir
-		if (path.contains(head-4) || head / 4 == 0) {
-			neighborList.remove(neighborList.indexOf(head-4));
+		if (path.contains(head-(sideLength)) || head / sideLength == 0) {
+			neighborList.remove(neighborList.indexOf(head-sideLength));
 		}//remove top left dir
-		if (path.contains(head-5) || head / 4 == 0 || head % 4 ==0) {
-			neighborList.remove(neighborList.indexOf(head-5));
+		if (path.contains(head-(sideLength+1)) || head / sideLength == 0 || head % sideLength ==0) {
+			neighborList.remove(neighborList.indexOf(head-(sideLength+1)));
 		}//remove left dir
-		if (path.contains(head-1) || head % 4 == 0) {
+		if (path.contains(head-1) || head % sideLength == 0) {
 			neighborList.remove(neighborList.indexOf(head-1));
 		}//remove bot left dir
-		if (path.contains(head+3) || head / 4 == 3 || head % 4 == 0) {
-			neighborList.remove(neighborList.indexOf(head+3));
+		if (path.contains(head+(sideLength-1)) || head / sideLength == sideLength-1 || head % sideLength == 0) {
+			neighborList.remove(neighborList.indexOf(head+(sideLength-1)));
 		}//remove bot dir
-		if (path.contains(head+4) || head / 4 == 3) {
-			neighborList.remove(neighborList.indexOf(head+4));
+		if (path.contains(head+(sideLength)) || head / sideLength == sideLength-1) {
+			neighborList.remove(neighborList.indexOf(head+sideLength));
 		}//remove bot right dir
-		if (path.contains(head+5) || head / 4 == 3 || head % 4 == 3) {
-			neighborList.remove(neighborList.indexOf(head+5));
+		if (path.contains(head+(sideLength+1)) || head / sideLength == sideLength-1 || head % sideLength == sideLength-1) {
+			neighborList.remove(neighborList.indexOf(head+(sideLength+1)));
 		}//remove right dir
-		if (path.contains(head+1) || head % 4 == 3) {
+		if (path.contains(head+1) || head % sideLength == sideLength-1) {
 			neighborList.remove(neighborList.indexOf(head+1));
 		}//remove top right dir
-		if (path.contains(head-3) || head / 4 == 0 || head % 4 == 3) {
-			neighborList.remove(neighborList.indexOf(head-3));
+		if (path.contains(head-(sideLength-1)) || head / sideLength == 0 || head % sideLength == sideLength-1) {
+			neighborList.remove(neighborList.indexOf(head-(sideLength-1)));
 		}
 		
 		return neighborList;
