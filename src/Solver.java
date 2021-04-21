@@ -109,7 +109,6 @@ public class Solver {
         }
         //sort the unique words
         Collections.sort(uniqueWords);
-        System.out.println("there are " + uniqueWords.size() + " Unique Words");
         return uniqueWords; 
     
     }   

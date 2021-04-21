@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Collections;
+import java.util.Random;
+import java.io.FileWriter;
 public class Runner {
 
     private static Board board;
@@ -52,11 +56,7 @@ public class Runner {
     public static void renderPlayScreen() {
         String header = "[1] rotate left\t [2] rotate right\t[3] check time\t[4] quit";
         String body = "Words Found\n --------------\n";
-        Iterator i = (Iterator) userWords.iterator();
-        while (i.hasNext()){
-            body+= i.next() + "\n";
-        }
-
+        body+=formattedWords(userWords);
         clrScreen();
         System.out.println(header);
         System.out.println(board.prettyBoardString());
@@ -66,12 +66,12 @@ public class Runner {
 
     public static void renderEndGame() { 
         String body = "\n ------- Words Found -------\n";
+        body += formattedWords(userWords); 
         Iterator i = (Iterator) userWords.iterator();
         int score = 0;
         while (i.hasNext()){
             String n = (String) i.next();
             int wl = n.length();
-            body+= n + "\n";
             switch (wl) {
                 case 3:
                     score+=1;
@@ -109,6 +109,88 @@ public class Runner {
         Scanner scan = new Scanner(System.in);
         scan.nextLine();
     }
+       
+    //given a list of strings 
+    //return a string formatted with columns being word length buckets 
+    //3   |4    |5     |6      |  7+
+    //cat |bark |ships |lights |
+    //dog |ship |tight |       |
+    public static String formattedWords(List<String> words){
+        //set up a list of empty string list for each word bin
+        List<List<String>> bins = new ArrayList<List<String>>();
+        for (int i = 0; i < 5; i++) {
+            bins.add(new ArrayList<String>());
+        }
+        //sort words into bins
+        Iterator itty = (Iterator) words.iterator();
+        while (itty.hasNext()) {
+            String w = (String) itty.next();
+            switch (w.length()){
+                case 3:
+                    bins.get(0).add(w);
+                    break;
+                case 4:
+                    bins.get(1).add(w);
+                    break;
+                case 5:
+                    bins.get(2).add(w);
+                    break;
+                case 6: 
+                    bins.get(3).add(w);
+                    break;
+                case 7:
+                    bins.get(4).add(w);
+                    break;
+                default:
+                    bins.get(4).add(w);
+                    break; 
+            }    
+        }
+        //define custom comparator to soft by length then value
+        class LengthComp implements Comparator<String> {
+            public int compare(String s1, String s2) {
+                int res = s1.length() - s2.length(); 
+                return res;
+            }
+        }
+
+        for (int i=0; i<4; i++) {
+            Collections.sort(bins.get(i));
+        }
+
+        //sort 7+ by alph then size   
+        Collections.sort(bins.get(4));
+        Collections.sort(bins.get(4),new LengthComp());
+        //find the bin with the most words
+       int maxndx = 0;
+       for (int i = 0; i<5; i++) {
+            if (bins.get(i).size() > bins.get(maxndx).size()) {
+                maxndx=i; 
+            }
+       }
+       int max = bins.get(maxndx).size();
+       String buffer = "3   |4    |5     |6      |7\n";
+
+       for ( int i=0; i < max; i++){
+           String row = "";
+           for ( int j=0; j < 5; j++) {
+                if (bins.get(j).size() != 0) {
+                    row+=bins.get(j).remove(0)+" |"; 
+                } else {
+                    String fill = "";
+                    for (int k=0; k < j+3+1; k++) {
+                        fill+=" ";
+                    }
+                    fill+="|";   
+                    row+=fill; 
+                }
+           }
+           row+="\n";
+           buffer+=row;
+        } 
+        return buffer;
+        
+    }
 
     //todo
     //this method will return the list of plurizations missed by the user
@@ -139,10 +221,29 @@ public class Runner {
         List<String> missed = new ArrayList<String>();
         return missed;
     }
+   
+    //generate a csv file with board densities 
+    public static void analyze(int numdp) {
+
+        try {        
+            FileWriter csvWriter = new FileWriter("density.csv"); 
+            for (int i=0; i < numdp; i++ ) {
+               shakeAndSolve(4);
+               int den = solution.size();
+               csvWriter.append(""+den+"\n");
+            }
+            csvWriter.flush();
+            csvWriter.close();
+        }catch(IOException e) {
+            System.exit(0);
+        }
+
+    }
 
 
     
 	public static void main(String[] args) {
+        analyze(300);
         //setupt solver
 		String filePATH = "src/res/corncob_lowercase.txt";
 		boardSolver = new Solver(filePATH);	
@@ -168,9 +269,7 @@ public class Runner {
                             System.exit(0);
                             break;
                         case "s":
-                            for (String s : solution) {
-                                    System.out.println(s);
-                            }
+                            System.out.println(formattedWords(solution));
                             System.out.println("Enter to return to board");
                             scan.nextLine();
                             break;

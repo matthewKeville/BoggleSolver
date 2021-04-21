@@ -54,7 +54,14 @@ public class Board {
 	public List<Character> getLetters(){
 		return letters;
 	}
-	
+
+    public String printBoardString(){
+        String result="";
+        for (char x : letters) {
+          result+=x; 
+        }
+        return result;
+    }	
 
 	//print the board in a 4x4 grid
     //old print needs to be redone ..
@@ -101,7 +108,6 @@ public class Board {
         //String mid = "| ──┼───┼───┼── |";
         //String bot =   "└───────────────┘"; 
 
-        System.out.println("size " + this.size); 
         String board = "" + top;
         for (int i = 0; i < this.size; i++) {
 
