@@ -96,6 +96,8 @@ public class Solver {
 		return solution;
 	}
 
+    //reduce the solution map to only the unique words on the board
+    //throws away paths that are different but yield the same word
     public List<String> createUniqueWords() {
         uniqueWords = new ArrayList<String>();
         Set keys = solution.keySet();
@@ -111,7 +113,9 @@ public class Solver {
         Collections.sort(uniqueWords);
         return uniqueWords; 
     
-    }   
+    }
+
+       
 	
 	//given a numerical position on the board, find all possible boggle Paths that start with that position
 	//return a list with 2 List<List<Integer>> which is frontier and closed

@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Collections;
 import java.util.Random;
+import java.util.Map;
 public class BoggleService {
 
     private static Board board;
@@ -18,7 +19,7 @@ public class BoggleService {
     private static int duration = 1000*durationInSeconds;    
     private final static int maxSize = 30;
     private final static int minSize = 4;
-
+    
     //randomize the boggle board and solve it
     public static void shakeAndSolve(int size){
         board = new Board(size);	
@@ -32,7 +33,9 @@ public class BoggleService {
        and board solving.    
     */ 
 	public static void main(String[] args) {
+        String wordFilePath = "";
         switch(args[0]) {
+                     
             case "make":
                 int size = Integer.parseInt(args[1]);            
                 board = new Board(size);
@@ -43,11 +46,21 @@ public class BoggleService {
             //constructor only supports 4x4 board
             case "solve":
                 board = new Board(args[1]);
-                String wordFilePath = args[2];
+                wordFilePath = args[2];
                 boardSolver = new Solver(wordFilePath);
                 boardSolver.solveBoard(board);
                 System.out.println(boardSolver.createUniqueWords());
                 break;
+            //provide solution map to std out
+            case "solution":
+                board = new Board(args[1]);
+                wordFilePath = args[2];
+                boardSolver = new Solver(wordFilePath);
+                //hashmap of paths and words
+                Map<List<Integer>, String> solution = boardSolver.solveBoard(board);
+                System.out.println(solution);
+                break;
+
             case "pretty":
                 board = new Board(args[1]);
                 System.out.println(board.prettyBoardString());
@@ -55,8 +68,8 @@ public class BoggleService {
             case "check":
                 board = new Board(args[1]);
                 String potential = args[2];
-                String wordFile = args[3];
-                boardSolver = new Solver(wordFile);
+                wordFilePath = args[3];
+                boardSolver = new Solver(wordFilePath);
                 boardSolver.solveBoard(board);
                 System.out.println(boardSolver.createUniqueWords().contains(potential));
                 break; 
