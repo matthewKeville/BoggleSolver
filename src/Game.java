@@ -416,7 +416,6 @@ public class Game{
 
     
     public void inspectLast() {
-        renderPlayScreen();
         boolean viewing = true;
         Scanner scan = new Scanner(System.in);
         while (viewing) {
