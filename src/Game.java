@@ -11,10 +11,12 @@ import java.io.FileWriter;
 public class Game{
 
     private Board board;
+    private Board prevBoard;
     private Solver boardSolver;
     private List<String> userWords; 
     private List<String> solution;
-    private int mode;  //0 dev , 1 timed
+    private List<String> prevSolution;
+    private boolean timed;
     private int size;
     private long timeStart;
     private int durationInSeconds;
@@ -27,12 +29,10 @@ public class Game{
       solution = new ArrayList<String>();
       //board creation
       size = 4;
-      //private Board board = new Board(size);
-      
       boardSolver = new Solver("src/res/corncob_lowercase.txt");
       shakeAndSolve(size);
       //state management
-      mode = 1;  //0 dev , 1 timed
+      timed = true;
       timeStart = System.currentTimeMillis();
       durationInSeconds = 30;
       duration = 1000*durationInSeconds;    
@@ -73,6 +73,17 @@ public class Game{
         String header = "[1] rotate left\t [2] rotate right\t[3] check time\t[4] quit";
         String body = "Words Found\n --------------\n";
         body+=formattedWords(userWords);
+        clrScreen();
+        System.out.println(header);
+        System.out.println(board.prettyBoardString());
+        System.out.println(body);
+    
+    }
+
+    public void renderInspectScreen() {
+        String header = "[1] rotate left\t [2] rotate right\t[3] exit\t";
+        String body = "All Words\n --------------\n";
+        body+=formattedWords(prevSolution);
         clrScreen();
         System.out.println(header);
         System.out.println(board.prettyBoardString());
@@ -121,7 +132,7 @@ public class Game{
         System.out.printf("Your Score : %d%n",score);        
         System.out.printf("Percent Of Words Found :  %.2f",percent);
         System.out.println(body);
-        System.out.println("Press enter to continue");
+        System.out.println("Press enter to return to the main menu");
         Scanner scan = new Scanner(System.in);
         scan.nextLine();
     }
@@ -237,135 +248,200 @@ public class Game{
         List<String> missed = new ArrayList<String>();
         return missed;
     }
-   
+
+    //Launch the main menu
+    public void start() {
+      Scanner scan = new Scanner(System.in);
+      boolean running = true;
+      while(running) {
+        List<String> menuOptions = Arrays.asList(new String[]{"p","l","i","q"});
+                String query =  "Welcome to Keville's Boggle Client\n" +
+                                "----------------------------------\n" +
+                                "[p] Play\n" +
+                                "[l] Inspect Last Game\n" +
+                                "[i] Info\n"  +
+                                "[q] Quit\n"; 
+                String choice = queryResponse(menuOptions,query);
+                switch(choice) {
+                          case "p":
+                            //play();
+                            settings();
+                            break;
+                          //only show if lastGame is not null
+                          case "l":
+                            if (prevBoard == null) {
+                              clrScreen();
+                              System.out.println("You must play a game, before using this feature");
+                              scan.nextLine();
+                            } else {
+                              inspectLast();    
+                            }
+                            break;
+                          case "i":
+                            clrScreen();
+                            System.out.println("The BoggleSolver Project" +
+                            " was developed by Matthew Keville");
+                            scan.nextLine(); 
+                            break;
+                          case "q":
+                            System.exit(0);
+                            break;
+        }
+      }
+    }
+
+    //Adjust the Game Settings
+    public void settings() {
+      Scanner scan = new Scanner(System.in);
+      boolean running = true;
+      while(running){ 
+      //free mode
+       List<String> menuOptions = Arrays.asList(new String[]{"s","m","t","c","v","r"});
+       String query = "Current Game Settings\n" +
+                      "-------------------\n" + 
+                      "Board Size : " + size + "\n" +
+                      "Board Density : N/A" + "\n"  +
+                      "Time Mode : " + (timed ? "[ON]" : "[OFF]") + "\n" +
+                      "-------------------\n" + 
+                      "[s] Start\n" +
+                      "[m] Mix The Board\n" +
+                      "[t] Toggle Timer \n" +
+                      "[c] Change board size\n" +
+                      "[v] Change Render Size\n" +
+                      "[r] Return";
+        String choice = queryResponse(menuOptions,query);
+        switch(choice) {
+                case "s":
+                    play();
+                    //break out of options loop and 
+                    //return to the main menu
+                    running = false;
+                    break;
+                case "m":
+                    shakeAndSolve(size);
+                    System.out.println(board.prettyBoardString());
+                    break;
+                case "t":
+                    timed = false;;
+                    break;
+                case "c":
+                    List<String> sizeResponses = new ArrayList<String>();
+                    for (int i=0; i < maxSize-minSize; i++){
+                        sizeResponses.add(""+(i+minSize));
+                    }
+
+                    String sizeQuery = "Pick the new board size" +
+                                   "[4] 4x4 Original \n" +
+                                   "[5] 5x5 Big      \n" +
+                                   "[6] 6x6 Xtra     \n" +
+                                   "[n] nxn where " + minSize + " < n < " + maxSize;
+                    String newSize = queryResponse(sizeResponses,sizeQuery); 
+                    System.out.println("Board size set to " + newSize);
+                    size = Integer.parseInt(newSize); 
+                    shakeAndSolve(size);
+                    System.out.println(board.prettyBoardString());
+                    break;
+                case "r":
+                    return;
+       }
+      }
+    }
+
+    //Launch a game
 	public void play() {
-        //analyze(300);
         //setupt solver
 		String filePATH = "src/res/corncob_lowercase.txt";
 		boardSolver = new Solver(filePATH);	
         //create and solve new board
         shakeAndSolve(size); 
-			
         Scanner scan = new Scanner(System.in);
-        boolean running = true;
-        while(running){ 
-            //free mode
-            if (mode==0) {
-                List<String> mainResponses = Arrays.asList(new String[]{"q","s","r","t","c","p"});
-                String query =  board.prettyBoardString() + "\n" +  
-                                "[s] Print out the solutions\n" +
-                                "[r] Randomize the board\n" +
-                                "[t] Enter timed mode \n" +
-                                "[c] change board size\n" +
-                                "[q] Quit\n" +
-                                "[p] rotate";
-                String choice = queryResponse(mainResponses,query);
-                switch(choice) {
-                        case "q":
-                            System.exit(0);
-                            break;
-                        case "s":
-                            System.out.println(formattedWords(solution));
-                            System.out.println("Enter to return to board");
-                            scan.nextLine();
-                            break;
-                        case "r":
-                            shakeAndSolve(size);
-                            System.out.println(board.prettyBoardString());
-                            break;
-                        case "t":
-                            mode = 1;
-                            break;
-                        case "c":
-                            List<String> sizeResponses = new ArrayList<String>();
-                            for (int i=0; i < maxSize-minSize; i++){
-                                sizeResponses.add(""+(i+minSize));
-                            }
+        boolean play = true;
+        //reset game variables
+        userWords.clear();
+        timeStart = System.currentTimeMillis();
 
-                            String sizeQuery = "Pick the new board size" +
-                                           "[4] 4x4 Original \n" +
-                                           "[5] 5x5 Big      \n" +
-                                           "[6] 6x6 Xtra     \n" +
-                                           "[n] nxn where " + minSize + " < n < " + maxSize;
-                            String newSize = queryResponse(sizeResponses,sizeQuery); 
-                            System.out.println("Board size set to " + newSize);
-                            size = Integer.parseInt(newSize); 
-                            shakeAndSolve(size);
-                            System.out.println(board.prettyBoardString());
-                            break;
-                        case "p":
-                            board.rotate();
-                            break;
+        while (play && (!timed || System.currentTimeMillis() - timeStart < duration)) {
+            renderPlayScreen();
+            String ans = scan.nextLine();
+            //if ans is numeric than its using the menu
+            if (ans.matches("[1-9]")) {
+              switch(ans){
+                case "1":
+                  board.rotate();
+                  renderPlayScreen();
+                  break;
+                case "2":
+                  board.rotate();
+                  board.rotate();
+                  board.rotate();
+                  renderPlayScreen();
+                  break;
+                 case "3":
+                   clrScreen();
+                   if (!timed ) {
+                     System.out.println("Infinity");
+                     scan.nextLine();
+                   }
+                   else {
+                     double timeInSeconds = (System.currentTimeMillis() - timeStart)/((double)1000);
+                     int remainingSeconds = ((int) (durationInSeconds - timeInSeconds));
+                     System.out.println(remainingSeconds);
+                     scan.nextLine();
+                   }
+                   break;
+                 case "4":
+                   play = false;
+                   break;
+                }
             }
+            else if (System.currentTimeMillis() - timeStart < duration) {
 
-            //timed mode
-            }else{
-                shakeAndSolve(size);
-                List<String> timedResponses = Arrays.asList(new String[]{"s","r","f"});
-                String timedQuery =  "You have entered timed mode\n" +
-                                     "Current Board Density : " + solution.size() + "\n" +
-                                     "[s] Start\n" +
-                                     "[r] Randomize the board\n" +
-                                     "[f] Return to free mode\n";
-                String timedChoice = queryResponse(timedResponses,timedQuery);
-                switch(timedChoice){
-                    case "s":
-                        boolean play = true;
-                        userWords.clear();
-                        timeStart = System.currentTimeMillis();
-                        renderPlayScreen();
-                        while (System.currentTimeMillis() - timeStart < duration && play) {
-                            String ans = scan.nextLine();
-                            //if ans is numeric than its using the menu
-                            if (ans.matches("[1-9]")) {
-                                switch(ans){
-                                    case "1":
-                                        board.rotate();
-                                        renderPlayScreen();
-                                        break;
-                                    case "2":
-                                        board.rotate();
-                                        board.rotate();
-                                        board.rotate();
-                                        renderPlayScreen();
-                                        break;
-                                    case "3":
-                                        //....
-                                        break;
-                                    case "4":
-                                        play = false;
-                                        break;
-                                }
-                                        
-                            }
-                            else if (System.currentTimeMillis() - timeStart < duration) {
-
-                                    if (solution.contains(ans) && !userWords.contains(ans)){
-                                        userWords.add(ans);     
-                                        System.out.println("Nice : added " + ans);                   
-                                    } else {
-                                        System.out.println("Not a word");
-                                    }
-                                    renderPlayScreen();
-                            }
-                            else {
-                            }
-                        }
-                        renderEndGame();
-                        break;
-                    case "r":
-                        shakeAndSolve(size);
-                        break;
-                    case "f":
-                        mode=0;
-                        break; 
-              } 
-                
+                    if (solution.contains(ans) && !userWords.contains(ans)){
+                        userWords.add(ans);     
+                        System.out.println("Nice : added " + ans);                   
+                    } else {
+                        System.out.println("Not a word");
+                    }
+                    renderPlayScreen();
             }
+            else {
+
+            }
+         }
+         //Times Up Spongebob
+         prevBoard = board;
+         prevSolution = solution;
+         renderEndGame();
+    }
+
     
-        }
-	 
-	}
-    
+    public void inspectLast() {
+        renderPlayScreen();
+        boolean viewing = true;
+        Scanner scan = new Scanner(System.in);
+        while (viewing) {
+          renderInspectScreen();
+          String ans = scan.nextLine();
+          //if ans is numeric than its using the menu
+          if (ans.matches("[1-9]")) {
+            switch(ans){
+              case "1":
+                board.rotate();
+                break;
+              case "2":
+                board.rotate();
+                board.rotate();
+                board.rotate();
+                break;
+              case "3":
+                viewing = false;
+                break;
+           }
+         } else {
+
+         }
+       }
+       ////// 
+    }
     
 }
