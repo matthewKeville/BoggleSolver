@@ -12,7 +12,7 @@ public class Game{
 
     private Board board;
     private Board prevBoard;
-    private Solver boardSolver;
+    private ClassicSolver boardSolver;
     private List<String> userWords; 
     private List<String> solution;
     private List<String> prevSolution;
@@ -29,7 +29,7 @@ public class Game{
       solution = new ArrayList<String>();
       //board creation
       size = 4;
-      boardSolver = new Solver("src/res/corncob_lowercase.txt");
+      boardSolver = new ClassicSolver("src/res/corncob_lowercase.txt");
       shakeAndSolve(size);
       //state management
       timed = true;
@@ -65,7 +65,7 @@ public class Game{
     //randomize the boggle board and solve it
     public void shakeAndSolve(int size){
         board = new Board(size);	
-		boardSolver.solveBoard(board); //numeric paths
+		boardSolver.solve(board); //numeric paths
         solution = boardSolver.createUniqueWords(); //character representations
     }
     
@@ -351,7 +351,7 @@ public class Game{
 	public void play() {
         //setupt solver
 		String filePATH = "src/res/corncob_lowercase.txt";
-		boardSolver = new Solver(filePATH);	
+		boardSolver = new ClassicSolver(filePATH);	
         //create and solve new board
         shakeAndSolve(size); 
         Scanner scan = new Scanner(System.in);

@@ -23,14 +23,14 @@ public class Stat {
     //analyze the distribuition of board density
     //and the solve time
     public static void densityTest(int dp,int size) {  
-        Solver boardSolver = new Solver("src/res/corncob_lowercase.txt");
+        ClassicSolver boardSolver = new ClassicSolver("src/res/corncob_lowercase.txt");
         try {
             String fileName = "data"+size+".csv";
             FileWriter csvWriter = new FileWriter(fileName);
             for ( int i=0; i< dp; i++ ) {
                 Board board = new Board(size);
                 long start = System.nanoTime();
-                boardSolver.solveBoard(board);
+                boardSolver.solve(board);
                 long finish = System.nanoTime();
                 long elapsed = finish - start;               
                 int den = boardSolver.createUniqueWords().size();

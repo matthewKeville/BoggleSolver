@@ -16,7 +16,7 @@ public class BoggleService {
 	public static void main(String[] args) {
         String wordFilePath = "";
         Board board;
-        Solver boardSolver;
+        ClassicSolver boardSolver;
         switch(args[0]) {
                      
             case "make":
@@ -28,16 +28,16 @@ public class BoggleService {
             //constructor only supports 4x4 board
             case "solve":
                 board = new Board(args[1]);
-                boardSolver = new Solver("src/res/corncob_lowercase.txt");
-                boardSolver.solveBoard(board);
+                boardSolver = new ClassicSolver("src/res/corncob_lowercase.txt");
+                boardSolver.solve(board);
                 System.out.println(boardSolver.createUniqueWords());
                 break;
             //provide solution map to std out
             case "solution":
                 board = new Board(args[1]);
-                boardSolver = new Solver("src/res/corncob_lowercase.txt");
+                boardSolver = new ClassicSolver("src/res/corncob_lowercase.txt");
                 //hashmap of paths and words
-                Map<List<Integer>, String> solution = boardSolver.solveBoard(board);
+                Map<List<Integer>, String> solution = boardSolver.solve(board);
                 System.out.println(solution);
                 break;
 
@@ -48,8 +48,8 @@ public class BoggleService {
             case "check":
                 board = new Board(args[1]);
                 String potential = args[2];
-                boardSolver = new Solver("src/res/corncob_lowercase.txt");
-                boardSolver.solveBoard(board);
+                boardSolver = new ClassicSolver("src/res/corncob_lowercase.txt");
+                boardSolver.solve(board);
                 System.out.println(boardSolver.createUniqueWords().contains(potential));
                 break; 
         }
