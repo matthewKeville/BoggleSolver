@@ -64,7 +64,7 @@ public class Game{
     
     //randomize the boggle board and solve it
     public void shakeAndSolve(int size){
-        board = new Board(size);	
+        board = new ClassicBoard(size);	
 		boardSolver.solve(board); //numeric paths
         solution = boardSolver.createUniqueWords(); //character representations
     }
@@ -75,7 +75,7 @@ public class Game{
         body+=formattedWords(userWords);
         clrScreen();
         System.out.println(header);
-        System.out.println(board.prettyBoardString());
+        //System.out.println(board.prettyBoardString());
         System.out.println(body);
     
     }
@@ -86,7 +86,7 @@ public class Game{
         body+=formattedWords(prevSolution);
         clrScreen();
         System.out.println(header);
-        System.out.println(board.prettyBoardString());
+        //System.out.println(board.prettyBoardString());
         System.out.println(body);
     
     }
@@ -127,7 +127,7 @@ public class Game{
         }
         double percent =  (double) userWords.size() / (double) solution.size();
         clrScreen(); 
-        System.out.println(board.prettyBoardString());
+        //System.out.println(board.prettyBoardString());
         System.out.println("Game Over");
         System.out.printf("Your Score : %d%n",score);        
         System.out.printf("Percent Of Words Found :  %.2f",percent);
@@ -319,7 +319,7 @@ public class Game{
                     break;
                 case "m":
                     shakeAndSolve(size);
-                    System.out.println(board.prettyBoardString());
+                    //System.out.println(board.prettyBoardString());
                     break;
                 case "t":
                     timed = false;;
@@ -339,7 +339,7 @@ public class Game{
                     System.out.println("Board size set to " + newSize);
                     size = Integer.parseInt(newSize); 
                     shakeAndSolve(size);
-                    System.out.println(board.prettyBoardString());
+                    //System.out.println(board.prettyBoardString());
                     break;
                 case "r":
                     return;
@@ -367,13 +367,13 @@ public class Game{
             if (ans.matches("[1-9]")) {
               switch(ans){
                 case "1":
-                  board.rotate();
+                  //board.rotate();
                   renderPlayScreen();
                   break;
                 case "2":
-                  board.rotate();
-                  board.rotate();
-                  board.rotate();
+                  //board.rotate();
+                  //board.rotate();
+                  //board.rotate();
                   renderPlayScreen();
                   break;
                  case "3":
@@ -425,12 +425,14 @@ public class Game{
           if (ans.matches("[1-9]")) {
             switch(ans){
               case "1":
-                board.rotate();
+                //board.rotate();
+                ;
                 break;
               case "2":
-                board.rotate();
-                board.rotate();
-                board.rotate();
+                ;
+                //board.rotate();
+                //board.rotate();
+                //board.rotate();
                 break;
               case "3":
                 viewing = false;

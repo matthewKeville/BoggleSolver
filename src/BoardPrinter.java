@@ -97,7 +97,7 @@ public class BoardPrinter {
         bot+=botEnd;
         String boardDisplay = "" + top;
         for (int i = 0; i < board.getSize(); i++) {
-
+            String rowString = "|";
             for (int j = 0; j < board.getSize(); j++) { 
                 String let = Character.toString(letters.get((i*board.getSize())+j));
                 if (let.equals("q")) {

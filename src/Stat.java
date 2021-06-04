@@ -28,7 +28,7 @@ public class Stat {
             String fileName = "data"+size+".csv";
             FileWriter csvWriter = new FileWriter(fileName);
             for ( int i=0; i< dp; i++ ) {
-                Board board = new Board(size);
+                Board board = new ClassicBoard(size);
                 long start = System.nanoTime();
                 boardSolver.solve(board);
                 long finish = System.nanoTime();
