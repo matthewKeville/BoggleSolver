@@ -19,19 +19,20 @@ public class ClassicBoard implements Board {
         this.type = "Classic";
 	}
 	
-	//Constructs a board from a a set of letters
-    //old cons , needs to be redone
-	public ClassicBoard(String boardString) {
-		letters = new ArrayList<Character>();
-		int stringLength = boardString.length();
-		for (int i = 0; i < stringLength; i++) {
-			letters.add(boardString.charAt(i));
-		}
-        this.size = 4;
-	}
+    public ClassicBoard(String boardString) {
+       //infer size
+       this.size = (int) Math.sqrt(boardString.length());
+       this.letters = new ArrayList<Character>();
+       //tranlsate letters 
+       for (int i = 0; i<boardString.length(); i++) {
+        this.letters.add(boardString.charAt(i));
+       }
+       //set type
+       this.type = "Classic";
+    }
 
     public Board clone() {
-       return new ClassicBoard(getBoardString()); 
+       return new ClassicBoard(this.getBoardString()); 
     }
 	
 	//returns the Letters list of the board
@@ -57,6 +58,13 @@ public class ClassicBoard implements Board {
 
     public String getType() {
         return type;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+    public void setType(String type) {
+        this.type = type;
     }
 
     
