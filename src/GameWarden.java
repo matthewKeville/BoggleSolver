@@ -44,7 +44,7 @@ public class GameWarden {
         gameMode = "classic";
 	    solver = new ClassicSolver(wordFilePath);
         this.size = 4;
-        current = new Board(size); 	
+        current = new ClassicBoard(size); 	
 	}
    
     //switch the GameWarden's mode to the given
