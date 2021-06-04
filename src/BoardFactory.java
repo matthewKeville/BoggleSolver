@@ -5,6 +5,8 @@ public class BoardFactory {
         switch(type) {
           case "Classic":
             return new ClassicBoard(size);
+          case "Redux":
+            return new ReduxBoard(size);
           default: 
             return new ClassicBoard(size);
         }

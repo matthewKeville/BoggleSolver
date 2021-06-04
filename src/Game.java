@@ -257,9 +257,10 @@ public class Game{
       boolean running = true;
       while(running){ 
       //free mode
-       List<String> menuOptions = Arrays.asList(new String[]{"s","m","t","c","v","r"});
+       List<String> menuOptions = Arrays.asList(new String[]{"s","m","t","c","g","v","r"});
        String query = "Current Game Settings\n" +
                       "-------------------\n" + 
+                      "Game Type : " + gw.getGameType() + "\n" +
                       "Board Size : " + size + "\n" +
                       "Board Density : N/A" + "\n"  +
                       "Time Mode : " + (timed ? "[ON]" : "[OFF]") + "\n" +
@@ -268,6 +269,7 @@ public class Game{
                       "[m] Mix The Board\n" +
                       "[t] Toggle Timer \n" +
                       "[c] Change board size\n" +
+                      "[g] Change game type\n" +
                       "[v] Change Render Size\n" +
                       "[r] Return";
         String choice = queryResponse(menuOptions,query);
@@ -290,7 +292,7 @@ public class Game{
                         sizeResponses.add(""+(i+minSize));
                     }
 
-                    String sizeQuery = "Pick the new board size" +
+                    String sizeQuery = "Pick the new board size\n" +
                                    "[4] 4x4 Original \n" +
                                    "[5] 5x5 Big      \n" +
                                    "[6] 6x6 Xtra     \n" +
@@ -299,8 +301,32 @@ public class Game{
                     System.out.println("Board size set to " + newSize);
                     gw.setSize(Integer.parseInt(newSize)); 
                     gw.shake();
-                    //System.out.println(board.prettyBoardString());
                     break;
+                case "g":
+                    List<String> gameResponses = new ArrayList<String>();
+                    gameResponses.add("c");
+                    gameResponses.add("r");
+                    String gameQuery = "Pick the new game type\n" +
+                                   "[c] classic : traditional boggle \n" +
+                                   "[r] redux : boggle with blocks #, and free spaces * \n";
+                    String newGameCode = queryResponse(gameResponses,gameQuery); 
+                    String newGameType;
+                    switch(newGameCode) {
+                        case "c":
+                            newGameType ="Classic";
+                            break;
+                        case "r": 
+                            newGameType = "Redux";
+                            break;
+                        default:
+                            newGameType = "Classic";
+                    } 
+                    gw.setGameType(newGameType);
+                    System.out.println("Game type set to " + newGameType);
+                    gw.shake();
+                    break;
+
+
                 case "r":
                     return;
        }

@@ -8,9 +8,9 @@ import java.util.Random;
 import java.util.Set;
 
 public class ClassicBoard implements Board {
-	private List<Character> letters; //the faces on the current board	
-    private int size;	
-    private String type;
+	protected List<Character> letters; //the faces on the current board	
+    protected int size;	
+    protected String type;
 	
 	//Constructs a Board with random initialization
 	public ClassicBoard(int size) {
