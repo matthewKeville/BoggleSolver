@@ -72,6 +72,10 @@ public class GameWarden {
         this.size = size;
         shake();
     }
+
+    public int getSize() {
+        return size;
+    }
     
     public  void setGameType(String gameType) {
         this.gameType = gameType;
@@ -107,6 +111,10 @@ public class GameWarden {
 
     public List<String> getUniqueWords() {
         return bs.getUniqueWords();
+    }
+    
+    public int getTotalWords() {
+        return bs.getUniqueWords().size();
     }
 
 

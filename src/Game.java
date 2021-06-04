@@ -16,7 +16,6 @@ public class Game{
     private GameWarden gw;
 
     private boolean timed;
-    private int size;
     private long timeStart;
     private int durationInSeconds;
     private int duration; 
@@ -116,7 +115,7 @@ public class Game{
                     break;
             }
         }
-        double percent =  (double) userWords.size() / (double) gw.getSolutionSize();
+        double percent =  (double) userWords.size() / (double) gw.getTotalWords();
         clrScreen(); 
         System.out.println(gw.getBoardDisplay());
         System.out.println("Game Over");
@@ -261,8 +260,8 @@ public class Game{
        String query = "Current Game Settings\n" +
                       "-------------------\n" + 
                       "Game Type : " + gw.getGameType() + "\n" +
-                      "Board Size : " + size + "\n" +
-                      "Board Density : N/A" + "\n"  +
+                      "Board Size : " + gw.getSize() + "\n" +
+                      "Board Density : " + gw.getTotalWords() + "\n"  +
                       "Time Mode : " + (timed ? "[ON]" : "[OFF]") + "\n" +
                       "-------------------\n" + 
                       "[s] Start\n" +
