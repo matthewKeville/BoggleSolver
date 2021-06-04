@@ -10,32 +10,29 @@ import java.util.Random;
 import java.io.FileWriter;
 public class Game{
 
-    private Board board;
-    private Board prevBoard;
-    private ClassicSolver boardSolver;
     private List<String> userWords; 
-    private List<String> solution;
-    private List<String> prevSolution;
+    private Board prevBoard;
+    private String prevGameType;
+    private GameWarden gw;
+
     private boolean timed;
     private int size;
     private long timeStart;
     private int durationInSeconds;
-    private int duration;    
+    private int duration; 
+   
     private final int maxSize = 30;
     private final int minSize = 4;
 
     public Game() {
-      userWords = new ArrayList<String>();  //store user words
-      solution = new ArrayList<String>();
-      //board creation
-      size = 4;
-      boardSolver = new ClassicSolver("src/res/corncob_lowercase.txt");
-      shakeAndSolve(size);
-      //state management
+      //statemangement 
+      userWords = new ArrayList<String>();
       timed = true;
       timeStart = System.currentTimeMillis();
       durationInSeconds = 30;
-      duration = 1000*durationInSeconds;    
+      duration = 1000*durationInSeconds;   
+      //Game Setup
+      gw = new GameWarden(); 
 
     }
 
@@ -62,12 +59,6 @@ public class Game{
         return ans;
     }
     
-    //randomize the boggle board and solve it
-    public void shakeAndSolve(int size){
-        board = new ClassicBoard(size);	
-		boardSolver.solve(board); //numeric paths
-        solution = boardSolver.getUniqueWords(); //character representations
-    }
     
     public void renderPlayScreen() {
         String header = "[1] rotate left\t [2] rotate right\t[3] check time\t[4] quit";
@@ -75,7 +66,7 @@ public class Game{
         body+=formattedWords(userWords);
         clrScreen();
         System.out.println(header);
-        //System.out.println(board.prettyBoardString());
+        System.out.println(gw.getBoardDisplay());
         System.out.println(body);
     
     }
@@ -83,10 +74,10 @@ public class Game{
     public void renderInspectScreen() {
         String header = "[1] rotate left\t [2] rotate right\t[3] exit\t";
         String body = "All Words\n --------------\n";
-        body+=formattedWords(prevSolution);
+        body+=formattedWords(gw.getUniqueWords());
         clrScreen();
         System.out.println(header);
-        //System.out.println(board.prettyBoardString());
+        System.out.println(gw.getBoardDisplay());
         System.out.println(body);
     
     }
@@ -125,9 +116,9 @@ public class Game{
                     break;
             }
         }
-        double percent =  (double) userWords.size() / (double) solution.size();
+        double percent =  (double) userWords.size() / (double) gw.getSolutionSize();
         clrScreen(); 
-        //System.out.println(board.prettyBoardString());
+        System.out.println(gw.getBoardDisplay());
         System.out.println("Game Over");
         System.out.printf("Your Score : %d%n",score);        
         System.out.printf("Percent Of Words Found :  %.2f",percent);
@@ -219,36 +210,6 @@ public class Game{
         
     }
 
-    //todo
-    //this method will return the list of plurizations missed by the user
-    //hard because there is more than one formula for pluralization
-    // s , es, , ies, ous, 
-    public List<String> missedPlurals(List<String> user, List<String> solution) {
-        List<String> missed = new ArrayList<String>();
-        return missed;
-    }
-    
-    //todo
-    public List<String> missedSuper(List<String> user, List<String> solution) {
-        List<String> missed = new ArrayList<String>();
-        for (String w : userWords) {
-            String miss = "";
-            for (String s : solution) {
-                if (1==0) {
-                    
-                }
-            }
-        }
-        return missed;
-
-    }
-
-    //todo
-    public List<String> missedSubs(List<String> user, List<String> solution) {
-        List<String> missed = new ArrayList<String>();
-        return missed;
-    }
-
     //Launch the main menu
     public void start() {
       Scanner scan = new Scanner(System.in);
@@ -318,8 +279,7 @@ public class Game{
                     running = false;
                     break;
                 case "m":
-                    shakeAndSolve(size);
-                    //System.out.println(board.prettyBoardString());
+                    gw.shake();
                     break;
                 case "t":
                     timed = false;;
@@ -337,8 +297,8 @@ public class Game{
                                    "[n] nxn where " + minSize + " < n < " + maxSize;
                     String newSize = queryResponse(sizeResponses,sizeQuery); 
                     System.out.println("Board size set to " + newSize);
-                    size = Integer.parseInt(newSize); 
-                    shakeAndSolve(size);
+                    gw.setSize(Integer.parseInt(newSize)); 
+                    gw.shake();
                     //System.out.println(board.prettyBoardString());
                     break;
                 case "r":
@@ -349,11 +309,8 @@ public class Game{
 
     //Launch a game
 	public void play() {
-        //setupt solver
-		String filePATH = "src/res/corncob_lowercase.txt";
-		boardSolver = new ClassicSolver(filePATH);	
         //create and solve new board
-        shakeAndSolve(size); 
+        gw.shake(); 
         Scanner scan = new Scanner(System.in);
         boolean play = true;
         //reset game variables
@@ -367,13 +324,11 @@ public class Game{
             if (ans.matches("[1-9]")) {
               switch(ans){
                 case "1":
-                  //board.rotate();
+                  gw.rotateBoardRight();
                   renderPlayScreen();
                   break;
                 case "2":
-                  //board.rotate();
-                  //board.rotate();
-                  //board.rotate();
+                  gw.rotateBoardLeft();
                   renderPlayScreen();
                   break;
                  case "3":
@@ -396,7 +351,7 @@ public class Game{
             }
             else if (System.currentTimeMillis() - timeStart < duration) {
 
-                    if (solution.contains(ans) && !userWords.contains(ans)){
+                    if (gw.isWord(ans) && !userWords.contains(ans)){
                         userWords.add(ans);     
                         System.out.println("Nice : added " + ans);                   
                     } else {
@@ -409,8 +364,8 @@ public class Game{
             }
          }
          //Times Up Spongebob
-         prevBoard = board;
-         prevSolution = solution;
+         this.prevBoard = gw.getBoard().clone();
+         prevGameType = gw.getGameType();
          renderEndGame();
     }
 
@@ -418,6 +373,7 @@ public class Game{
     public void inspectLast() {
         boolean viewing = true;
         Scanner scan = new Scanner(System.in);
+        gw.loadGame(prevBoard,prevGameType);
         while (viewing) {
           renderInspectScreen();
           String ans = scan.nextLine();
@@ -425,14 +381,12 @@ public class Game{
           if (ans.matches("[1-9]")) {
             switch(ans){
               case "1":
-                //board.rotate();
+                gw.rotateBoardRight();
                 ;
                 break;
               case "2":
                 ;
-                //board.rotate();
-                //board.rotate();
-                //board.rotate();
+                gw.rotateBoardLeft();
                 break;
               case "3":
                 viewing = false;
@@ -442,7 +396,6 @@ public class Game{
 
          }
        }
-       ////// 
     }
     
 }

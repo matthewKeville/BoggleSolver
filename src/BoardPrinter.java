@@ -74,7 +74,7 @@ public class BoardPrinter {
     }
     
     //print the board in ASCII art
-    public String prettyBoardString(){
+    public String getPrettyBoardDisplay(){
         List<Character> letters = board.getLetters();
         String topBase =  "┌────";
         String midBase =   "| ──┼";
@@ -124,7 +124,7 @@ public class BoardPrinter {
         return boardDisplay;
     }
 
-    public String printBoardString(){
+    public String getBoardDisplay(){
       List<Character> letters = board.getLetters();
       String boardDisplay = "";
       for (int i = 0; i < board.getSize(); i++) {

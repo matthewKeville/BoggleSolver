@@ -12,5 +12,6 @@ public interface Board {
     public int getSize();
     public List<Character> getLetters();
     public void setLetters(List<Character> newLetters);
+    public Board clone();
         
 }

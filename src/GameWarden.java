@@ -11,6 +11,7 @@ import java.util.Iterator;
  * The GameWarden class is responsible for
    Board Generation - Board creation
    Board Management - Board History
+   Board Presentation
    Word Validation   
    Scoring
    Game Analytics { missed words, missed supers, missed subs } 
@@ -39,48 +40,79 @@ public class GameWarden {
     private int size;
     private String wordFilePath;
 
+    //Establish Default settings and create a new board
     //default : classic, classicSolver, size is 4
 	public GameWarden() {
         wordFilePath = "src/res/corncob_lowercase.txt";
         gameType = "Classic";
-	    bs = new ClassicSolver(wordFilePath);
         this.size = 4;
+	    this.bs = new ClassicSolver(wordFilePath);
         this.bf = new BoardFactory();
         this.bp = new BoardPrinter();
-        this.board = bf.getInstance(size);	
+        shake();
 	}
 
     //create and solve a new boggle board with the current settings
     public void shake() {
-        this.board = bf.getInstance();
+        this.board = bf.getInstance(size,gameType);
         this.solution =  bs.solve(this.board);
+        this.uniqueWords = bs.getUniqueWords();
+        this.bp.setBoard(this.board);
     }
 
-   //reduce the solution map to only the unique words on the board
-    //throws away paths that are different but yield the same word
-    public List<String> getUniqueWords() {
-        List<String> uniqueWords = new ArrayList<String>();
-        Set keys = solution.keySet();
-        Iterator keyIterator = keys.iterator();
-        while(keyIterator.hasNext()) {
-            List<Integer> path = (List<Integer>) keyIterator.next();
-            String tmp = (String) solution.get(path);
-            if (!uniqueWords.contains(tmp)) {
-                uniqueWords.add(tmp);
-            }
-        }
-        //sort the unique words
-        Collections.sort(uniqueWords);
-        return uniqueWords; 
-    }   
- 
+    //load a known board into the GameWarden
+    public void loadGame(Board board,String gameType) {
+        this.board = board;
+        this.solution = bs.solve(board);
+        this.uniqueWords = bs.getUniqueWords();
+        this.bp.setBoard(board);
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+        shake();
+    }
+    
+    public  void setGameType(String gameType) {
+        this.gameType = gameType;
+    }
+
+    //add a field called display type to change board display
+    public String getBoardDisplay() {
+        //return this.bp.getBoardDisplay();
+        return this.bp.getPrettyBoardDisplay(); 
+    }
+
+    public Board getBoard() {
+        return board;
+    }
+      
+    public String getGameType() {
+        return gameType;
+    }
+
+    public void rotateBoardLeft() {
+        this.bp.rotateLeft();
+    }
+    
+    public void rotateBoardRight() {  
+        this.bp.rotateRight();
+    }
    
 
     //Stats
+    public int getSolutionSize() {
+        return solution.size();
+    }
+
+    public List<String> getUniqueWords() {
+        return bs.getUniqueWords();
+    }
+
 
     //determine if a word is in the solution set
 	public boolean isWord(String word) {
-		return getUniqueWords().contains(word);
+		return uniqueWords.contains(word);
 	}
 
     //score a single user
@@ -94,7 +126,6 @@ public class GameWarden {
         //todo
         return new ArrayList<Integer>();
     }
-
 	
 	
 }

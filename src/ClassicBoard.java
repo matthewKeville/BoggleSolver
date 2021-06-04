@@ -51,6 +51,10 @@ public class ClassicBoard implements Board {
 		this.solution = null;
         this.size = 4;
 	}
+
+    public Board clone() {
+       return new ClassicBoard(getBoardString()); 
+    }
 	
 	//returns the Letters list of the board
 	public List<Character> getLetters(){
@@ -212,12 +216,7 @@ public class ClassicBoard implements Board {
 		}
 	}
 
-    //remove	
-	/**@precondition setSolution has been called
-	 */
-	public List<String> getUniqueWords(){
-		return uniqueWords;
-	}
+    
 	
 	public String getBoardString() {
 		String boardString="";
