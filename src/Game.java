@@ -305,9 +305,11 @@ public class Game{
                     List<String> gameResponses = new ArrayList<String>();
                     gameResponses.add("c");
                     gameResponses.add("r");
+                    gameResponses.add("m");
                     String gameQuery = "Pick the new game type\n" +
                                    "[c] classic : traditional boggle \n" +
-                                   "[r] redux : boggle with blocks #, and free spaces * \n";
+                                   "[r] redux : boggle with blocks #, and free spaces * \n" +
+                                   "[m] music : find musical chords \n";
                     String newGameCode = queryResponse(gameResponses,gameQuery); 
                     String newGameType;
                     switch(newGameCode) {
@@ -316,6 +318,9 @@ public class Game{
                             break;
                         case "r": 
                             newGameType = "Redux";
+                            break;
+                        case "m":
+                            newGameType = "Music";
                             break;
                         default:
                             newGameType = "Classic";

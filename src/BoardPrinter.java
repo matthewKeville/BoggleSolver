@@ -99,6 +99,17 @@ public class BoardPrinter {
                 if (let.equals("q")) {
                     rowString+=" Qu";
                 }
+                //Danger : this is a quick solution, but a don't like the high coupling present
+                else if (board.getType().equals("Music")) {
+                    //substitute a - A#
+                    if (Character.isLowerCase(let.charAt(0))) {
+                        rowString+= " " + let.toUpperCase() + " ";
+                    }
+                    if (Character.isUpperCase(let.charAt(0))) {
+                        rowString+= " "+let+"#";
+                    }
+                }
+                ////////////////////////////////////////////////////////////////////////////////
                 else{
                     rowString+=" ";
                     rowString+=let;
