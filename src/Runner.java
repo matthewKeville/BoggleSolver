@@ -11,7 +11,19 @@ import java.io.FileWriter;
 public class Runner {
    public static void main(String[] args) {
      Game game = new Game();
-     //game.play(); 
      game.start();
+
+     /*
+     BoardPrinter bp = new BoardPrinter();
+     BoardFactory bf = new BoardFactory();
+     bp.setBoard(bf.getInstance(4));
+     System.out.println(bp.prettyBoardString());
+     bp.rotateRight();
+     System.out.println(bp.prettyBoardString());
+     bp.rotateLeft();
+     System.out.println(bp.printBoardString());
+     */     
+
    } 
+
 }

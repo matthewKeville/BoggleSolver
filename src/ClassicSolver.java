@@ -39,8 +39,8 @@ import java.util.Iterator;
 public class ClassicSolver implements Solver {
 	private String wordFilePath;
 	private List<String> words;//what is this
-    private List<String> uniqueWords;
-	private List<Character> letters;	//the letter the current board
+    //need to be reset
+	private List<Character> letters;//the letter the current board
 	private Map solution;			//a map of all of the valid boggle paths and there resultant strings
 
 	public ClassicSolver(String wordFilePath) {
@@ -48,20 +48,18 @@ public class ClassicSolver implements Solver {
 		this.letters = new ArrayList<Character>();
 		this.wordFilePath = wordFilePath;
 		this.words = new ArrayList<String>();
-        this.uniqueWords = new ArrayList<String>();
 		this.solution = new HashMap<List<Integer>,String>();	// a map that holds paths and strings
 		loadWordsFromFile();
 	}
 	
-	public void clear() {
-		letters.clear();
+	private void clear() {
 		solution.clear();
+        letters.clear();
 	}
 	
 	
 	/** Executes Boggle Path on each die on the board
 	 *  returns a map of the resulting words 
-	 * 
 	 * 
 	 * @param board
 	 * 
@@ -97,10 +95,11 @@ public class ClassicSolver implements Solver {
 		return solution;
 	}
 
+
     //reduce the solution map to only the unique words on the board
     //throws away paths that are different but yield the same word
-    public List<String> createUniqueWords() {
-        uniqueWords = new ArrayList<String>();
+    public List<String> getUniqueWords() {
+        List<String> uniqueWords = new ArrayList<String>();
         Set keys = solution.keySet();
         Iterator keyIterator = keys.iterator();
         while(keyIterator.hasNext()) {
@@ -113,14 +112,13 @@ public class ClassicSolver implements Solver {
         //sort the unique words
         Collections.sort(uniqueWords);
         return uniqueWords; 
-    
-    }
+    }   
 
-       
+
 	
 	//given a numerical position on the board, find all possible boggle Paths that start with that position
 	//return a list with 2 List<List<Integer>> which is frontier and closed
-	public List<List<List<Integer>>> bogglePath(List<List<Integer>> frontier,List<List<Integer>> closed,int sideLength) {
+	private List<List<List<Integer>>> bogglePath(List<List<Integer>> frontier,List<List<Integer>> closed,int sideLength) {
 		
 		List<List<Integer>> newFrontier = new ArrayList<List<Integer>>();
 		
@@ -161,7 +159,7 @@ public class ClassicSolver implements Solver {
 	}
 	
 	//return the valid neighbors of the path
-	public List<Integer> getNeighbors(List<Integer> path,int sideLength) {
+	private List<Integer> getNeighbors(List<Integer> path,int sideLength) {
 		int pathLength = path.size();
 		int head = path.get(pathLength-1);
 		List<Integer> neighborList = new ArrayList<Integer>();
@@ -238,7 +236,7 @@ public class ClassicSolver implements Solver {
 	 * @return index if found
 	 * 
 	 */
-	public int binaryPartialStringSearch(String searchString, int min, int max) {
+	private int binaryPartialStringSearch(String searchString, int min, int max) {
 
 		if ( min == max) {
 			return -1;
@@ -279,7 +277,7 @@ public class ClassicSolver implements Solver {
 	 * @return -1 if not found
 	 * @return index if found
 	 */
-	public int binaryStringSearch(String pathString,int min, int max) {
+	private int binaryStringSearch(String pathString,int min, int max) {
 		
 		//base case
 		if ( min == max) {
@@ -303,20 +301,20 @@ public class ClassicSolver implements Solver {
 	}
 	
 	//determines if a string is the words list
-	public boolean isWord(String pathString) {
+	private boolean isWord(String pathString) {
 		int index = binaryStringSearch(pathString,0,words.size()-1);
 		return (index!=-1)?true:false;
 	}
 	
 	
 	//Determines if string is a substring (0,n) of 
-	public boolean isPartialWord(String pathString) {
+	private boolean isPartialWord(String pathString) {
 		int index = binaryPartialStringSearch(pathString,0,words.size()-1);
 		return (index!=-1)?true:false;
 	}
 		
 	//ensures the words are atleast 3 letters long
-	public boolean isLegalWord(String word) {
+	private boolean isLegalWord(String word) {
 		return (word.length()>2)?true:false;
 	}
 	
@@ -327,7 +325,7 @@ public class ClassicSolver implements Solver {
 	 * @param numPath
 	 * @return the string represented by the path
 	 */
-	public String pathToString(List<Integer> numPath){
+	private String pathToString(List<Integer> numPath){
 		int pathLength = numPath.size();
 		String pathString = "";
 		for (int i = 0; i < pathLength; i++) {

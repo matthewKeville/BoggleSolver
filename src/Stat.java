@@ -33,7 +33,7 @@ public class Stat {
                 boardSolver.solve(board);
                 long finish = System.nanoTime();
                 long elapsed = finish - start;               
-                int den = boardSolver.createUniqueWords().size();
+                int den = boardSolver.getUniqueWords().size();
                 //density, elapsed time 
                 csvWriter.append(""+den+","+elapsed+"\n");
             }

@@ -26,51 +26,45 @@ import java.util.Iterator;
  *
  */
 public class GameWarden {
-    private Solver solver;
-    private Board current; //board should be either programmed to an interface,
-                           //or allow generality and constraints to comply with a 
-                           //factory pattern
-    private Map<List<Integer>,String> currentSolution;
-    private Board previous;
+    private Solver bs;
+    private BoardFactory bf;
+    private BoardPrinter bp;
+
+    private Map<List<Integer>,String> solution;
+    private List<String> uniqueWords;
+
+    private Board board;
     //boggle classic, boggle redux, boggle links, boggle chords
-    //should be changed to enum
-    private String gameMode;
+    private String gameType;
     private int size;
     private String wordFilePath;
 
     //default : classic, classicSolver, size is 4
 	public GameWarden() {
         wordFilePath = "src/res/corncob_lowercase.txt";
-        gameMode = "classic";
-	    solver = new ClassicSolver(wordFilePath);
+        gameType = "Classic";
+	    bs = new ClassicSolver(wordFilePath);
         this.size = 4;
-        current = new ClassicBoard(size); 	
+        this.bf = new BoardFactory();
+        this.bp = new BoardPrinter();
+        this.board = bf.getInstance(size);	
 	}
-   
-    //switch the GameWarden's mode to the given
-    //game name, will change solver 
-    //should be changed to enum
-    /*
-    public void setMode(String mode) {
-      if (mode.equals("classic")) {
-        solver = new ClassicSolver();
-        current = new Board();
-      } else {
-        //redux ?
-      }
-        //links ?
+
+    //create and solve a new boggle board with the current settings
+    public void shake() {
+        this.board = bf.getInstance();
+        this.solution =  bs.solve(this.board);
     }
-    */
-	
-    // - helper method	- //
-	//decompose the solution map, into a list of unique words
-    private List<String> createUniqueWords() {
+
+   //reduce the solution map to only the unique words on the board
+    //throws away paths that are different but yield the same word
+    public List<String> getUniqueWords() {
         List<String> uniqueWords = new ArrayList<String>();
-        Set keys = currentSolution.keySet();
+        Set keys = solution.keySet();
         Iterator keyIterator = keys.iterator();
         while(keyIterator.hasNext()) {
             List<Integer> path = (List<Integer>) keyIterator.next();
-            String tmp = (String) currentSolution.get(path);
+            String tmp = (String) solution.get(path);
             if (!uniqueWords.contains(tmp)) {
                 uniqueWords.add(tmp);
             }
@@ -78,22 +72,15 @@ public class GameWarden {
         //sort the unique words
         Collections.sort(uniqueWords);
         return uniqueWords; 
-    
-    }
-
-    
-
-    //Accessors
-
-    public Board getBoard() {
-      return current;
-    }
+    }   
+ 
+   
 
     //Stats
 
     //determine if a word is in the solution set
 	public boolean isWord(String word) {
-		return createUniqueWords().contains(word);
+		return getUniqueWords().contains(word);
 	}
 
     //score a single user

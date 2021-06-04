@@ -10,4 +10,6 @@ import java.util.List;
 import java.util.Map;
 public interface Solver {
   public Map<List<Integer>,String> solve(Board board);
+  //@precondition - solve has been called
+  public List<String> getUniqueWords();
 }

@@ -66,7 +66,7 @@ public class Game{
     public void shakeAndSolve(int size){
         board = new ClassicBoard(size);	
 		boardSolver.solve(board); //numeric paths
-        solution = boardSolver.createUniqueWords(); //character representations
+        solution = boardSolver.getUniqueWords(); //character representations
     }
     
     public void renderPlayScreen() {

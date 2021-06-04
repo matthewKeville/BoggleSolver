@@ -16,6 +16,8 @@ public class BoardPrinter {
     private Board board;
     private int rotation; // 0 - 3 = no , right, 2*right, 3*right
 
+    public BoardPrinter() {};
+
     public BoardPrinter(Board board){
       this.board = board;
     } 
@@ -41,7 +43,6 @@ public class BoardPrinter {
         //for each layer
         for (int i=0; i < innerRotations; i++) {
             //fill swap buffer
-            System.out.println("\n Layer" + i);
             for (int k=0; k < board.getSize()-(i*2); k++) {
                 swapNorth[k] = letters.get(i+(i*board.getSize())+k);
                 swapEast[k] = letters.get( (board.getSize()-1)*(i+1)+board.getSize()*k );
@@ -121,6 +122,20 @@ public class BoardPrinter {
         }
         boardDisplay+=bot;
         return boardDisplay;
+    }
+
+    public String printBoardString(){
+      List<Character> letters = board.getLetters();
+      String boardDisplay = "";
+      for (int i = 0; i < board.getSize(); i++) {
+        String rowString = ""; 
+        for (int j = 0; j < board.getSize(); j++) {
+            rowString+=Character.toString(letters.get((i*board.getSize())+j));
+        }
+        rowString+="\n";
+        boardDisplay+=rowString;
+      }
+      return boardDisplay;
     }
 
 }
