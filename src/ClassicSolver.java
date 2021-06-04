@@ -44,6 +44,7 @@ public class ClassicSolver implements Solver {
 	private Map solution;			//a map of all of the valid boggle paths and there resultant strings
 
 	public ClassicSolver(String wordFilePath) {
+        super();
 		this.letters = new ArrayList<Character>();
 		this.wordFilePath = wordFilePath;
 		this.words = new ArrayList<String>();
