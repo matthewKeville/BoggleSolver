@@ -50,13 +50,8 @@ public class BoardPrinter {
                 swapWest[k] =  letters.get( (board.getSize()-1)*(board.getSize()-i)-(board.getSize()*k));
 
             }
-            //System.out.println("North" + Arrays.toString(swapNorth)); 
-            //System.out.println("East" + Arrays.toString(swapEast)); 
-            //System.out.println("South" + Arrays.toString(swapSouth));  
-            //System.out.println("West" + Arrays.toString(swapWest)); 
 
-            //put North in East, East in South ...
-            for (int k=0; k < board.getSize()-(i*2); k++) {
+           for (int k=0; k < board.getSize()-(i*2); k++) {
                 letters.set((board.getSize()-1)*(i+1)+board.getSize()*k,swapNorth[k]); //put North in East
                 letters.set( (board.getSize()-i)*board.getSize()-(1+i)-k,swapEast[k]); //put East in South
                 letters.set( (board.getSize()-1)*(board.getSize()-i)-(board.getSize()*k),swapSouth[k]); //put South in West
