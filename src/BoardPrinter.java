@@ -20,57 +20,27 @@ public class BoardPrinter {
 
     public BoardPrinter(Board board){
       this.board = board;
+      this.rotation = 0;
     } 
 
     public void setBoard(Board board) {
       this.board = board;
+      this.rotation = 0;
     }
 
-
-    //each board has i innner layers, in which we make 4 substitutions
-    // there are size // 2 inner layers with more than 1 element
-    //those we swap the 4 sides for as many inner layers as there are
-    //we load each side into a buffer and then swap
-    public void rotateRight() {
-        List<Character> letters = board.getLetters();
-        // integer division is the number of inner layers that need to rotate
-        int innerRotations = board.getSize() /  2;
-        char[] swapNorth = new char[board.getSize()];
-        char[] swapEast = new char[board.getSize()];
-        char[] swapSouth = new char[board.getSize()];
-        char[] swapWest = new char[board.getSize()];
-
-        //for each layer
-        for (int i=0; i < innerRotations; i++) {
-            //fill swap buffer
-            for (int k=0; k < board.getSize()-(i*2); k++) {
-                swapNorth[k] = letters.get(i+(i*board.getSize())+k);
-                swapEast[k] = letters.get( (board.getSize()-1)*(i+1)+board.getSize()*k );
-                swapSouth[k] = letters.get( (board.getSize()-i)*board.getSize()-(1+i)-k);
-                swapWest[k] =  letters.get( (board.getSize()-1)*(board.getSize()-i)-(board.getSize()*k));
-
-            }
-
-           for (int k=0; k < board.getSize()-(i*2); k++) {
-                letters.set((board.getSize()-1)*(i+1)+board.getSize()*k,swapNorth[k]); //put North in East
-                letters.set( (board.getSize()-i)*board.getSize()-(1+i)-k,swapEast[k]); //put East in South
-                letters.set( (board.getSize()-1)*(board.getSize()-i)-(board.getSize()*k),swapSouth[k]); //put South in West
-                letters.set(i+(i*board.getSize())+k,swapWest[k]);
-            }
-        }
-        board.setLetters(letters);
+    public void rotateRight(){
+      this.board.rotateRight();
+      this.rotation = (this.rotation + 1) % 4;
     }
-
-    //I'm lazy
-    public void rotateLeft() {
-      for (int i=0; i<3; i++) {
-        rotateRight();
-      }
+    
+    public void rotateLeft(){
+      this.board.rotateLeft();
+      this.rotation = (this.rotation - 1) % 4;
     }
     
     //print the board in ASCII art
     public String getPrettyBoardDisplay(){
-        List<Character> letters = board.getLetters();
+        List<String> faces = board.getFaces();
         String topBase =  "┌────";
         String midBase =   "| ──┼";
         String botBase =  "└────";
@@ -92,22 +62,13 @@ public class BoardPrinter {
         mid+=midEnd;
         bot+=botEnd;
         String boardDisplay = "" + top;
+        System.out.println(faces.toString());
         for (int i = 0; i < board.getSize(); i++) {
             String rowString = "|";
             for (int j = 0; j < board.getSize(); j++) { 
-                String let = Character.toString(letters.get((i*board.getSize())+j));
+                String let = faces.get((i*board.getSize())+j);
                 if (let.equals("q")) {
                     rowString+=" Qu";
-                }
-                //Danger : this is a quick solution, but a don't like the high coupling present
-                else if (board.getType().equals("Music")) {
-                    //substitute a - A#
-                    if (Character.isLowerCase(let.charAt(0))) {
-                        rowString+= " " + let.toUpperCase() + " ";
-                    }
-                    if (Character.isUpperCase(let.charAt(0))) {
-                        rowString+= " "+let+"#";
-                    }
                 }
                 ////////////////////////////////////////////////////////////////////////////////
                 else{
@@ -131,12 +92,12 @@ public class BoardPrinter {
     }
 
     public String getBoardDisplay(){
-      List<Character> letters = board.getLetters();
+      List<String> faces = board.getFaces();
       String boardDisplay = "";
       for (int i = 0; i < board.getSize(); i++) {
         String rowString = ""; 
         for (int j = 0; j < board.getSize(); j++) {
-            rowString+=Character.toString(letters.get((i*board.getSize())+j));
+            rowString+=faces.get((i*board.getSize())+j);
         }
         rowString+="\n";
         boardDisplay+=rowString;

@@ -7,77 +7,41 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-public class MusicBoard implements Board {
-	protected List<Character> letters; //the faces on the current board	
-    protected int size;	
-    protected String type;
-	
-	//Constructs a Board with random initialization
+public class MusicBoard extends Board {
+
+    public MusicBoard() {
+        this.size = 4;
+        this.faces = generate(size);
+    } 
+    	
 	public MusicBoard(int size) {
-		this.letters = generate(size);
+		this.faces = generate(size);
         this.size = size;
-        this.type = "Music";
 	}
 	
-    public MusicBoard(String boardString) {
+    public MusicBoard(List<String> faces) {
        //infer size
-       this.size = (int) Math.sqrt(boardString.length());
-       this.letters = new ArrayList<Character>();
-       //tranlsate letters 
-       for (int i = 0; i<boardString.length(); i++) {
-        this.letters.add(boardString.charAt(i));
-       }
-       //set type
-       this.type = "Music";
+       this.size = (int) Math.sqrt(faces.size());
+       this.faces = faces;
     }
 
     public Board clone() {
-       return new MusicBoard(this.getBoardString()); 
+       List<String> facesCopy = new ArrayList<String>();
+       facesCopy.addAll(this.faces);
+       return new MusicBoard(facesCopy); 
     }
 	
-	//returns the Letters list of the board
-	public List<Character> getLetters(){
-		return letters;
-	}
-    //returns the Letters list as a string
-    public String getBoardString() {
-		String boardString="";
-		for ( Character c : letters) {
-			boardString+=c;
-		}
-		return boardString;
-	}
-
-    public void setLetters(List<Character> newLetters) {
-        this.letters = newLetters;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
-    }
-    public void setType(String type) {
-        this.type = type;
-    }
-
 	//return a list of characters that encode the boggle instance
-	private List<Character> generate(int size)
+	private List<String> generate(int size)
     {
-        List<Character> letters = new ArrayList<Character>();
+        List<String> faces = new ArrayList<String>();
         // a = A, A = A#
-        List<Character> notes = Arrays.asList('a','A','b','c','C','d','D','e','f','F','g','G');
+        List<String> notes = Arrays.asList("A","A#","B","C","C#","D","D#","E","F","F#","G","G#");
         Random rand = new Random();
         for (int i = 0; i < (int) Math.pow(size,2); i++) {
-           letters.add(notes.get(rand.nextInt(12)));
+           faces.add(notes.get(rand.nextInt(12)));
         }
-        return letters;
+        return faces;
 
     }
 	

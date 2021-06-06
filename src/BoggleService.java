@@ -20,37 +20,45 @@ public class BoggleService {
         switch(args[0]) {
                      
             case "make":
+                /*
                 int size = Integer.parseInt(args[1]);            
                 board = new ClassicBoard(size);
-                //System.out.println(board.printBoardString());
+                System.out.println(board.printBoardString());
+                */
                 break;
             //solve only works for 4x4 as Board(String boardString) 
             //constructor only supports 4x4 board
             case "solve":
+                /*
                 board = new ClassicBoard(args[1]);
                 boardSolver = new ClassicSolver("src/res/corncob_lowercase.txt");
                 boardSolver.solve(board);
-                //System.out.println(boardSolver.createUniqueWords());
+                System.out.println(boardSolver.createUniqueWords());
+                */
                 break;
-            //provide solution map to std out
             case "solution":
+                /*
                 board = new ClassicBoard(args[1]);
                 boardSolver = new ClassicSolver("src/res/corncob_lowercase.txt");
                 //hashmap of paths and words
                 Map<List<Integer>, String> solution = boardSolver.solve(board);
                 System.out.println(solution);
+                */
                 break;
-
             case "pretty":
+                /*
                 board = new ClassicBoard(args[1]);
-                //System.out.println(board.prettyBoardString());
+                System.out.println(board.prettyBoardString());
+                */
                 break;
             case "check":
+                /*
                 board = new ClassicBoard(args[1]);
                 String potential = args[2];
                 boardSolver = new ClassicSolver("src/res/corncob_lowercase.txt");
                 boardSolver.solve(board);
-                //System.out.println(boardSolver.createUniqueWords().contains(potential));
+                System.out.println(boardSolver.createUniqueWords().contains(potential));
+                */
                 break; 
         }
     }

@@ -8,22 +8,24 @@ import java.util.Random;
 import java.util.Set;
 
 public class ReduxBoard extends ClassicBoard {
-    //Constructs a Board with random initialization
-	public ReduxBoard(int size) {
+
+    public ReduxBoard() {
+        super(4);
+        mutate();
+    } 
+
+    public ReduxBoard(int size) {
         super(size);
-        super.type = "Redux";
         mutate();
 	}
 	
-	//Constructs a board from a a set of letters
-	public ReduxBoard(String boardString) {
-        super(boardString);
-        super.type = "Redux";
+	public ReduxBoard(List<String> faces) {
+        super(faces);
 	}
 
-    //return a duplicate object
+    @Override
     public Board clone() {
-       return new ReduxBoard(getBoardString()); 
+       return new ReduxBoard(this.faces); 
     }
 
     //randomly inject special characters into the board
@@ -33,17 +35,17 @@ public class ReduxBoard extends ClassicBoard {
     public void mutate() {
         Random rand = new Random();
         //int specialTiles = rand.nextInt(5) + 1;
-        double coverage = .20*super.letters.size();
+        double coverage = .20*faces.size();
         int specialTiles = (int) (rand.nextGaussian()*(coverage) + coverage);
         while (specialTiles != 0) {
           //pick a random index
-          int tile = rand.nextInt(super.letters.size());
+          int tile = rand.nextInt(faces.size());
           //make sure it doesn't have a special tile
           //subsitute with random special
-          Character c = super.letters.get(tile);
-          if ( !c.equals('#') && !c.equals('*') ) {
-            Character spc = rand.nextInt(2) % 2 == 0 ? '#' : '*';
-            super.letters.set(tile,spc);
+          String c = faces.get(tile);
+          if ( !c.equals("#") && !c.equals("*") ) {
+            String spc = rand.nextInt(2) % 2 == 0 ? "#" : "*";
+            faces.set(tile,spc);
             specialTiles--;
           }             
  

@@ -40,12 +40,12 @@ public class ClassicSolver implements Solver {
 	private String wordFilePath;
 	private List<String> words;//what is this
     //need to be reset
-	private List<Character> letters;//the letter the current board
+	private List<String> faces;//the letter the current board
 	private Map solution;			//a map of all of the valid boggle paths and there resultant strings
 
 	public ClassicSolver(String wordFilePath) {
         super();
-		this.letters = new ArrayList<Character>();
+		this.faces = new ArrayList<String>();
 		this.wordFilePath = wordFilePath;
 		this.words = new ArrayList<String>();
 		this.solution = new HashMap<List<Integer>,String>();	// a map that holds paths and strings
@@ -54,7 +54,7 @@ public class ClassicSolver implements Solver {
 	
 	private void clear() {
 		solution.clear();
-        letters.clear();
+        faces.clear();
 	}
 	
 	
@@ -71,8 +71,8 @@ public class ClassicSolver implements Solver {
 		clear();
 		
 		//apply board instance to the solver
-		this.letters = board.getLetters();
-        int numDice = letters.size();
+		this.faces = board.getFaces();
+        int numDice = faces.size();
         int sideLength = (int) Math.sqrt(numDice);
 	
 		//solve the board
@@ -329,11 +329,8 @@ public class ClassicSolver implements Solver {
 		int pathLength = numPath.size();
 		String pathString = "";
 		for (int i = 0; i < pathLength; i++) {
-			char c = this.letters.get(numPath.get(i));
+			String c = this.faces.get(numPath.get(i));
 			pathString += c;
-			if (c == 'q' ) {		//add the u for the Qu tile
-				pathString+='u';
-			}
 		}
 		return pathString;
 	}

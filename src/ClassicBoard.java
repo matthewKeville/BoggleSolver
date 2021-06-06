@@ -7,71 +7,36 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-public class ClassicBoard implements Board {
-	protected List<Character> letters; //the faces on the current board	
-    protected int size;	
-    protected String type;
-	
-	//Constructs a Board with random initialization
-	public ClassicBoard(int size) {
-		this.letters = generate(size);
-        this.size = size;
-        this.type = "Classic";
-	}
-	
-    public ClassicBoard(String boardString) {
-       //infer size
-       this.size = (int) Math.sqrt(boardString.length());
-       this.letters = new ArrayList<Character>();
-       //tranlsate letters 
-       for (int i = 0; i<boardString.length(); i++) {
-        this.letters.add(boardString.charAt(i));
-       }
-       //set type
-       this.type = "Classic";
-    }
-
-    public Board clone() {
-       return new ClassicBoard(this.getBoardString()); 
-    }
-	
-	//returns the Letters list of the board
-	public List<Character> getLetters(){
-		return letters;
-	}
-    //returns the Letters list as a string
-    public String getBoardString() {
-		String boardString="";
-		for ( Character c : letters) {
-			boardString+=c;
-		}
-		return boardString;
-	}
-
-    public void setLetters(List<Character> newLetters) {
-        this.letters = newLetters;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
-    }
-    public void setType(String type) {
-        this.type = type;
-    }
+public class ClassicBoard extends Board {
 
     
+    public ClassicBoard() {
+        this.size = 4;
+        this.faces = generate(size);
+    }
+	
+	public ClassicBoard(int size) {
+        this.size = size;
+        this.faces = generate(size);
+	}
+
+    public ClassicBoard(List<String> faces) {
+       //infer size
+       this.size = (int) Math.sqrt(faces.size());
+       this.faces = faces;
+    }
+
+    @Override
+    public Board clone() {
+       List<String> facesCopy = new ArrayList<String>();
+       facesCopy.addAll(this.faces);
+       return new ClassicBoard(facesCopy);
+    }
+	
 
 	//return a list of characters that encode the boggle instance
-	private List<Character> generate(int size){
-		        //4x4 boggle
+	protected List<String> generate(int size){
+		//4x4 boggle
 		List<String> original = 
 			Arrays.asList(
 							"aocsph",
@@ -139,29 +104,31 @@ public class ClassicBoard implements Board {
                 break;
         }
         Random rand = new Random();
-		List<Character> letters = new ArrayList<Character>();
+
+		List<String> faces = new ArrayList<String>();
 		//Roll the Dice: For each die, pick one of the six faces at random
 		for(int i = 0; i < dice.size(); i++) {
-			letters.add(dice.get(i).charAt(rand.nextInt(6)));
+            int pos = rand.nextInt(6);
+			faces.add(dice.get(i).substring(pos,pos+1));
 		}
 		//Permute Faces: randomize position of selected faces
         //size is used here , this might be an issue...
 		int idx1;
 		int idx2;
-		char c;
-		for ( int i = 0; i < letters.size(); i++) {
+        String c = "";
+		for ( int i = 0; i < faces.size(); i++) {
 			idx1 = i;
-			idx2 = (rand.nextInt(letters.size()-i)+i);
-			c = letters.get(idx1);
-			letters.set(idx1, letters.get(idx2));
-			letters.set(idx2, c);
+			idx2 = (rand.nextInt(faces.size()-i)+i);
+			c = faces.get(idx1);
+			faces.set(idx1, faces.get(idx2));
+			faces.set(idx2, c);
 		}
-		return letters;
+		return faces;
 	}
 
     //when boards requested are bigger than actual boggle boards,
     //generate the amount dice required to construct a board
-    private List<String> extendedDice(int boardSize){
+    protected List<String> extendedDice(int boardSize){
        int diecount = (int) Math.pow(boardSize,2);
        List<String> dice = new ArrayList<String>(); 
        for ( int i = 0; i < diecount; i++) {
