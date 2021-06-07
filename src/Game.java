@@ -28,7 +28,7 @@ public class Game{
       userWords = new ArrayList<String>();
       timed = true;
       timeStart = System.currentTimeMillis();
-      durationInSeconds = 30;
+      durationInSeconds = 180;
       duration = 1000*durationInSeconds;   
       //Game Setup
       gw = new GameWarden(); 

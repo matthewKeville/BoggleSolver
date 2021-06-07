@@ -62,7 +62,6 @@ public class BoardPrinter {
         mid+=midEnd;
         bot+=botEnd;
         String boardDisplay = "" + top;
-        System.out.println(faces.toString());
         for (int i = 0; i < board.getSize(); i++) {
             String rowString = "|";
             for (int j = 0; j < board.getSize(); j++) { 

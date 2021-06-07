@@ -118,7 +118,7 @@ public class ClassicSolver implements Solver {
 	
 	//given a numerical position on the board, find all possible boggle Paths that start with that position
 	//return a list with 2 List<List<Integer>> which is frontier and closed
-	private List<List<List<Integer>>> bogglePath(List<List<Integer>> frontier,List<List<Integer>> closed,int sideLength) {
+	protected List<List<List<Integer>>> bogglePath(List<List<Integer>> frontier,List<List<Integer>> closed,int sideLength) {
 		
 		List<List<Integer>> newFrontier = new ArrayList<List<Integer>>();
 		
@@ -159,7 +159,7 @@ public class ClassicSolver implements Solver {
 	}
 	
 	//return the valid neighbors of the path
-	private List<Integer> getNeighbors(List<Integer> path,int sideLength) {
+	protected List<Integer> getNeighbors(List<Integer> path,int sideLength) {
 		int pathLength = path.size();
 		int head = path.get(pathLength-1);
 		List<Integer> neighborList = new ArrayList<Integer>();
@@ -211,7 +211,7 @@ public class ClassicSolver implements Solver {
 	
 	//reads the words from the file pointed to by wordFilePath
 	//into the List words
-	private void loadWordsFromFile() {
+	protected void loadWordsFromFile() {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(wordFilePath));
 			String line = reader.readLine();
@@ -236,7 +236,7 @@ public class ClassicSolver implements Solver {
 	 * @return index if found
 	 * 
 	 */
-	private int binaryPartialStringSearch(String searchString, int min, int max) {
+	protected int binaryPartialStringSearch(String searchString, int min, int max) {
 
 		if ( min == max) {
 			return -1;
@@ -277,7 +277,7 @@ public class ClassicSolver implements Solver {
 	 * @return -1 if not found
 	 * @return index if found
 	 */
-	private int binaryStringSearch(String pathString,int min, int max) {
+	protected int binaryStringSearch(String pathString,int min, int max) {
 		
 		//base case
 		if ( min == max) {
@@ -301,20 +301,20 @@ public class ClassicSolver implements Solver {
 	}
 	
 	//determines if a string is the words list
-	private boolean isWord(String pathString) {
+	protected boolean isWord(String pathString) {
 		int index = binaryStringSearch(pathString,0,words.size()-1);
 		return (index!=-1)?true:false;
 	}
 	
 	
 	//Determines if string is a substring (0,n) of 
-	private boolean isPartialWord(String pathString) {
+	protected boolean isPartialWord(String pathString) {
 		int index = binaryPartialStringSearch(pathString,0,words.size()-1);
 		return (index!=-1)?true:false;
 	}
 		
 	//ensures the words are atleast 3 letters long
-	private boolean isLegalWord(String word) {
+	protected boolean isLegalWord(String word) {
 		return (word.length()>2)?true:false;
 	}
 	
