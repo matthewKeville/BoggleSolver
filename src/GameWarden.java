@@ -38,12 +38,12 @@ public class GameWarden {
     //boggle classic, boggle redux, boggle links, boggle chords
     private String gameType;
     private int size;
-    private String wordFilePath;
+
+    private final String wordFilePath = "src/res/corncob_lowercase.txt";
 
     //Establish Default settings and create a new board
     //default : classic, classicSolver, size is 4
 	public GameWarden() {
-        wordFilePath = "src/res/corncob_lowercase.txt";
         gameType = "Classic";
         this.size = 4;
 	    this.bs = new ClassicSolver(wordFilePath);
@@ -79,6 +79,14 @@ public class GameWarden {
     
     public  void setGameType(String gameType) {
         this.gameType = gameType;
+        switch (this.gameType) {
+            case "Classic":
+              //this.bs = new ClassicSolver(wordFilePath);
+              this.bs = new ClassicSolver(wordFilePath);
+              break;
+            default:
+              System.exit(0);
+            }
     }
 
     //add a field called display type to change board display
