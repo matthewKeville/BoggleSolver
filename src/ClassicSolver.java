@@ -1,5 +1,3 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,6 +7,10 @@ import java.util.Map;
 import java.util.Collections;
 import java.util.Set;
 import java.util.Iterator;
+import java.util.stream.*;
+import java.util.function.*;
+import java.nio.file.Files; //much more succint
+import java.nio.file.Paths; //takes advantage of streams
 /**
  * @author matthewkeville
  * 
@@ -39,22 +41,10 @@ import java.util.Iterator;
 public class ClassicSolver implements Solver {
 	private String wordFilePath;
 	private List<String> words;//what is this
-    //need to be reset
-	private List<String> faces;//the letter the current board
-	private Map solution;			//a map of all of the valid boggle paths and there resultant strings
 
 	public ClassicSolver(String wordFilePath) {
-        super();
-		this.faces = new ArrayList<String>();
 		this.wordFilePath = wordFilePath;
-		this.words = new ArrayList<String>();
-		this.solution = new HashMap<List<Integer>,String>();	// a map that holds paths and strings
 		loadWordsFromFile();
-	}
-	
-	private void clear() {
-		solution.clear();
-        faces.clear();
 	}
 	
 	
@@ -67,26 +57,24 @@ public class ClassicSolver implements Solver {
 	 */
 	public Map<List<Integer>,String> solve(Board board) {
 		
-		//wipe previous board
-		clear();
-		
 		//apply board instance to the solver
-		this.faces = board.getFaces();
-        int numDice = faces.size();
-        int sideLength = (int) Math.sqrt(numDice);
+		List<String> faces = board.getFaces();
+        int sideLength = (int) Math.sqrt(faces.size());
 	
 		//solve the board
-		List frontier = 	new ArrayList<List<Integer>>();
-		for (int i = 0; i < numDice; i ++) {
-			frontier.add( new ArrayList<Integer>  (Arrays.asList(i)) );
+		List frontier = new ArrayList<List<Integer>>();
+		for (int i = 0; i < faces.size(); i ++) {
+			frontier.add( new ArrayList<Integer>(Arrays.asList(i)));
 		}
 		
-		List closed =	 new ArrayList<List<Integer>>();
-		List<List<List<Integer>>> result = bogglePath(frontier,closed,sideLength);
+		List closed = new ArrayList<List<Integer>>();
+
+		List<List<List<Integer>>> result = bogglePath(frontier,closed,faces);
 		List<List<Integer>> wordPaths = result.get(1);
+        Map<List<Integer>,String> solution = new HashMap();
 		
 		for(List<Integer> L :wordPaths) {
-			String tmp = pathToString(L);
+			String tmp = pathToString(L,faces);
 			if (isLegalWord(tmp)) {
 				solution.put(L,tmp);
 			}
@@ -98,7 +86,8 @@ public class ClassicSolver implements Solver {
 
     //reduce the solution map to only the unique words on the board
     //throws away paths that are different but yield the same word
-    public List<String> getUniqueWords() {
+    public List<String> solveWords(Board board) {
+        Map<List<Integer>,String> solution = solve(board); 
         List<String> uniqueWords = new ArrayList<String>();
         Set keys = solution.keySet();
         Iterator keyIterator = keys.iterator();
@@ -118,15 +107,16 @@ public class ClassicSolver implements Solver {
 	
 	//given a numerical position on the board, find all possible boggle Paths that start with that position
 	//return a list with 2 List<List<Integer>> which is frontier and closed
-	protected List<List<List<Integer>>> bogglePath(List<List<Integer>> frontier,List<List<Integer>> closed,int sideLength) {
-		
+	protected List<List<List<Integer>>> bogglePath(List<List<Integer>> frontier,List<List<Integer>> closed,List<String> faces) {
+	
+        int sideLength = (int) Math.sqrt(faces.size());	
 		List<List<Integer>> newFrontier = new ArrayList<List<Integer>>();
 		
 		//explore the frontier
 		for (List<Integer> path : frontier) {
 			
 			//check the possible physical neighbors for the leading index of the current path
-			List<Integer> neighbors = getNeighbors(path,sideLength);
+			List<Integer> neighbors = getNeighbors(path,faces);
 			
 			//construct the neighboring paths
 			List<List<Integer>> neighborPaths = new ArrayList<List<Integer>>();
@@ -135,20 +125,20 @@ public class ClassicSolver implements Solver {
 				List<Integer> path_i = new ArrayList(path);
 				path_i.add(neighbors.get(i));
 				//ensure this path might be an English Word
-				if (isPartialWord(pathToString(path_i))) {
+				if (isPartialWord(pathToString(path_i,faces))) {
 					neighborPaths.add(path_i);
 				}
 			}
 			//add all of the neighboring paths to the new frontier
 			newFrontier.addAll(neighborPaths);
 			//add the current path to the closed if its valid
-			if(isWord(pathToString(path))){
+			if(isWord(pathToString(path,faces))){
 				closed.add(path);
 			}
 		}
 		
 		if(newFrontier.size()!=0) {						//recursive case
-			return bogglePath(newFrontier,closed,sideLength);
+			return bogglePath(newFrontier,closed,faces);
 		}else{											//base case
 			List<List<List<Integer>>> end = new ArrayList<List<List<Integer>>>();
 			end.add(newFrontier);
@@ -159,52 +149,34 @@ public class ClassicSolver implements Solver {
 	}
 	
 	//return the valid neighbors of the path
-	protected List<Integer> getNeighbors(List<Integer> path,int sideLength) {
+	protected List<Integer> getNeighbors(List<Integer> path,List<String> faces) {
+        int sideLength = (int) Math.sqrt(faces.size());
 		int pathLength = path.size();
 		int head = path.get(pathLength-1);
-		List<Integer> neighborList = new ArrayList<Integer>();
-		neighborList.add(head-1);//left
-		neighborList.add(head-(sideLength+1));//top left
-		neighborList.add(head-(sideLength-1));//top right
-		neighborList.add(head-sideLength);//top
-		neighborList.add(head+1);//right
-		neighborList.add(head+(sideLength+1));//bot right
-		neighborList.add(head+(sideLength-1));//bot left
-		neighborList.add(head+sideLength);//bot
-		
+        // l , tl , tr , t , r , br , bl , b
+        //Unfortunately Lists created by Arrays.asList are fixed side, 
+        //therefore we copy the Arrays.asList List into a new List constructor
+		List<Integer> neighborList = new ArrayList<Integer>(Arrays.asList(
+          head-1,head-(sideLength+1),head-(sideLength-1),
+          head-sideLength,head+1,head+(sideLength+1),
+          head+(sideLength-1),head+sideLength)); 
 
-		//remove the neighbors that 
-		//are physically invalid 
-		//( not in bounds or tile already used)
-	    // -size : up  +size : down
-        // +1 : right -1 :  left	
-		
-		//remove top dir
-		if (path.contains(head-(sideLength)) || head / sideLength == 0) {
-			neighborList.remove(neighborList.indexOf(head-sideLength));
-		}//remove top left dir
-		if (path.contains(head-(sideLength+1)) || head / sideLength == 0 || head % sideLength ==0) {
-			neighborList.remove(neighborList.indexOf(head-(sideLength+1)));
-		}//remove left dir
-		if (path.contains(head-1) || head % sideLength == 0) {
-			neighborList.remove(neighborList.indexOf(head-1));
-		}//remove bot left dir
-		if (path.contains(head+(sideLength-1)) || head / sideLength == sideLength-1 || head % sideLength == 0) {
-			neighborList.remove(neighborList.indexOf(head+(sideLength-1)));
-		}//remove bot dir
-		if (path.contains(head+(sideLength)) || head / sideLength == sideLength-1) {
-			neighborList.remove(neighborList.indexOf(head+sideLength));
-		}//remove bot right dir
-		if (path.contains(head+(sideLength+1)) || head / sideLength == sideLength-1 || head % sideLength == sideLength-1) {
-			neighborList.remove(neighborList.indexOf(head+(sideLength+1)));
-		}//remove right dir
-		if (path.contains(head+1) || head % sideLength == sideLength-1) {
-			neighborList.remove(neighborList.indexOf(head+1));
-		}//remove top right dir
-		if (path.contains(head-(sideLength-1)) || head / sideLength == 0 || head % sideLength == sideLength-1) {
-			neighborList.remove(neighborList.indexOf(head-(sideLength-1)));
-		}
-		
+        //cant remove while iterator over list, so iterate over copy
+        List<Integer> neighborListCopy = new ArrayList(neighborList);
+
+        //remove the neighbors that 
+		//are out of bounds, or already used
+        Predicate<Integer> p1 = x -> path.contains(x);
+        Predicate<Integer> p2 = x -> (x+sideLength) / sideLength == 0;
+        Predicate<Integer> p3 = x -> (x-sideLength) / sideLength == sideLength-1;
+        Predicate<Integer> p4 = x -> (x+1) % sideLength == 0;
+        Predicate<Integer> p5 = x -> (x-1) % sideLength == sideLength-1;
+        Predicate<Integer> p = (((p1.or(p2)).or(p3)).or(p4)).or(p5);
+
+        neighborListCopy.stream()
+            .filter(p) 
+            .forEach((x) -> { neighborList.remove(Integer.valueOf(x));}
+            );
 		return neighborList;
 		
 	}
@@ -212,19 +184,14 @@ public class ClassicSolver implements Solver {
 	//reads the words from the file pointed to by wordFilePath
 	//into the List words
 	protected void loadWordsFromFile() {
-		try {
-			BufferedReader reader = new BufferedReader(new FileReader(wordFilePath));
-			String line = reader.readLine();
-			while (line != null) {
-				//store the current line
-				words.add(line);
-				// read next line
-				line = reader.readLine();
-			}
-			reader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        try {
+        Stream<String> rows = Files.lines(Paths.get(wordFilePath));
+        words = rows
+            .collect(Collectors.toList());
+        rows.close();
+        } catch (IOException e) { 
+            e.printStackTrace(); 
+        }
 	}
 	
 	
@@ -325,11 +292,11 @@ public class ClassicSolver implements Solver {
 	 * @param numPath
 	 * @return the string represented by the path
 	 */
-	private String pathToString(List<Integer> numPath){
+	private String pathToString(List<Integer> numPath,List<String> faces){
 		int pathLength = numPath.size();
 		String pathString = "";
 		for (int i = 0; i < pathLength; i++) {
-			String c = this.faces.get(numPath.get(i));
+			String c = faces.get(numPath.get(i));
 			pathString += c;
 		}
 		return pathString;

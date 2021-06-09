@@ -56,7 +56,7 @@ public class GameWarden {
     public void shake() {
         this.board = bf.getInstance(size,gameType);
         this.solution =  bs.solve(this.board);
-        this.uniqueWords = bs.getUniqueWords();
+        this.uniqueWords = bs.solveWords(this.board);
         this.bp.setBoard(this.board);
     }
 
@@ -64,7 +64,7 @@ public class GameWarden {
     public void loadGame(Board board,String gameType) {
         this.board = board;
         this.solution = bs.solve(board);
-        this.uniqueWords = bs.getUniqueWords();
+        this.uniqueWords = bs.solveWords(board); //the double solve is kinda redundant
         this.bp.setBoard(board);
     }
 
@@ -118,11 +118,11 @@ public class GameWarden {
     }
 
     public List<String> getUniqueWords() {
-        return bs.getUniqueWords();
+        return uniqueWords;
     }
     
     public int getTotalWords() {
-        return bs.getUniqueWords().size();
+        return uniqueWords.size();
     }
 
 

@@ -9,7 +9,8 @@ by the GameMaster class
 import java.util.List;
 import java.util.Map;
 public interface Solver {
+  //return a map < List<Integer>, String > of all valid paths
   public Map<List<Integer>,String> solve(Board board);
-  //@precondition - solve has been called
-  public List<String> getUniqueWords();
+  //return a List<String> of all valid words
+  public List<String> solveWords(Board board);
 }

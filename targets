@@ -5,10 +5,7 @@ src/ReduxBoard.java
 src/BoardPrinter.java
 src/Solver.java
 src/ClassicSolver.java
-src/ClassicSolverNew.java
 src/Runner.java
-src/Stat.java
-src/BoggleService.java
 src/Game.java
 src/GameWarden.java
 src/MusicBoard.java
