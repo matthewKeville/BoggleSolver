@@ -8,9 +8,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.stream.*;
-import java.util.function.*;
-import java.nio.file.Files; //much more succint
-import java.nio.file.Paths; //takes advantage of streams
+import java.util.function.*; //for predicate
 /**
  * @author matthewkeville
  * 
@@ -39,12 +37,11 @@ import java.nio.file.Paths; //takes advantage of streams
  *
  */
 public class ClassicSolver implements Solver {
-	private String wordFilePath;
-	private List<String> words;//what is this
 
-	public ClassicSolver(String wordFilePath) {
-		this.wordFilePath = wordFilePath;
-		loadWordsFromFile();
+	private List<String> words;//List of legal words
+
+	public ClassicSolver(List<String> words) {
+		this.words = words;
 	}
 	
 	
@@ -75,7 +72,7 @@ public class ClassicSolver implements Solver {
 		
 		for(List<Integer> L :wordPaths) {
 			String tmp = pathToString(L,faces);
-			if (isLegalWord(tmp)) {
+			if (isWord(tmp)) {
 				solution.put(L,tmp);
 			}
 		}
@@ -181,19 +178,6 @@ public class ClassicSolver implements Solver {
 		
 	}
 	
-	//reads the words from the file pointed to by wordFilePath
-	//into the List words
-	protected void loadWordsFromFile() {
-        try {
-        Stream<String> rows = Files.lines(Paths.get(wordFilePath));
-        words = rows
-            .collect(Collectors.toList());
-        rows.close();
-        } catch (IOException e) { 
-            e.printStackTrace(); 
-        }
-	}
-	
 	
 	/**
 	 * 
@@ -269,6 +253,9 @@ public class ClassicSolver implements Solver {
 	
 	//determines if a string is the words list
 	protected boolean isWord(String pathString) {
+        if (pathString.length()<3){
+            return false;
+        }
 		int index = binaryStringSearch(pathString,0,words.size()-1);
 		return (index!=-1)?true:false;
 	}
@@ -280,11 +267,6 @@ public class ClassicSolver implements Solver {
 		return (index!=-1)?true:false;
 	}
 		
-	//ensures the words are atleast 3 letters long
-	protected boolean isLegalWord(String word) {
-		return (word.length()>2)?true:false;
-	}
-	
 	
 	/**converts the numerical path to a string
 	 * !the letter q will be substituted with qu

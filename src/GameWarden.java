@@ -30,6 +30,7 @@ public class GameWarden {
     private Solver bs;
     private BoardFactory bf;
     private BoardPrinter bp;
+    private SolverFactory sf;
 
     private Map<List<Integer>,String> solution;
     private List<String> uniqueWords;
@@ -46,7 +47,8 @@ public class GameWarden {
 	public GameWarden() {
         gameType = "Classic";
         this.size = 4;
-	    this.bs = new ClassicSolver(wordFilePath);
+        this.sf = new SolverFactory(wordFilePath);
+	    this.bs = sf.getInstance("Classic"); 
         this.bf = new BoardFactory();
         this.bp = new BoardPrinter();
         shake();
@@ -63,6 +65,7 @@ public class GameWarden {
     //load a known board into the GameWarden
     public void loadGame(Board board,String gameType) {
         this.board = board;
+        this.bs = sf.getInstance(gameType);
         this.solution = bs.solve(board);
         this.uniqueWords = bs.solveWords(board); //the double solve is kinda redundant
         this.bp.setBoard(board);
@@ -81,8 +84,7 @@ public class GameWarden {
         this.gameType = gameType;
         switch (this.gameType) {
             case "Classic":
-              //this.bs = new ClassicSolver(wordFilePath);
-              this.bs = new ClassicSolver(wordFilePath);
+              this.bs = sf.getInstance(this.gameType);
               break;
             default:
               System.exit(0);

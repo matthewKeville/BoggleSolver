@@ -9,3 +9,4 @@ src/Runner.java
 src/Game.java
 src/GameWarden.java
 src/MusicBoard.java
+src/SolverFactory.java
