@@ -12,35 +12,16 @@ import java.util.function.*; //for predicate
 /**
  * @author matthewkeville
  * 
- * This class solves Boggle Boards, Each instance uses the word file,
- * it was passed at construction
- * 
- *
- *	A boggle board is a 2D array of characters which can be represented by a 1-dimensional array
- *	A 4 x 4 board looks like the following
- *
- *	0	1	2	3
- *	4	5	6	7	
- *	8	9	10	11
- *	12	13	14	15
- *
- *	an index I has the potential following neighbors 
- *	(i-1)	left			(i+1)	right
- *	(i-3)	top right	(i+3)	bot left
- *	(i-4)	top			(i+4)	bot
- *	(i-5)	top left		(i+5)	bot right
- *
- *	a boggle path is valid iff 
- *		the numerical path represents a word under the conditions
- *			 of the faces of the dice
- *			&& the path uses the indices of the board only once
- *
- */
-public class ClassicSolver implements Solver {
+    adjust neighbors
+    adjust pathToString
+
+
+ *  */
+public class LinksSolver implements Solver {
 
 	private List<String> words;//List of legal words
 
-	public ClassicSolver(List<String> words) {
+	public LinksSolver(List<String> words) {
 		this.words = words;
 	}
 	
@@ -152,32 +133,74 @@ public class ClassicSolver implements Solver {
         int sideLength = (int) Math.sqrt(faces.size());
 		int pathLength = path.size();
 		int head = path.get(pathLength-1);
+        List<Integer> neighborList;
         // l , tl , tr , t , r , br , bl , b
         //Unfortunately Lists created by Arrays.asList are fixed side, 
         //therefore we copy the Arrays.asList List into a new List constructor
-		List<Integer> neighborList = new ArrayList<Integer>(Arrays.asList(
-          head-1,head-(sideLength+1),head-(sideLength-1),
-          head-sideLength,head+1,head+(sideLength+1),
-          head+(sideLength-1),head+sideLength)); 
+        List<String> links = Arrays.asList("+","-","|");
+        if (links.contains(faces.get(head))) {
+            neighborList = new ArrayList();
+            switch(faces.get(head)) {
+                //by definition links are not in outer tiles
+                case "-":
+                    if (!path.contains(head-1)) {
+                        neighborList.add(head-1);
+                    } 
+                    if (!path.contains(head+1)) {
+                        neighborList.add(head+1);
+                    }
+                    break;
+                case "+":
+                    if (!path.contains(head-1)) {
+                        neighborList.add(head-1);
+                    } 
+                    if (!path.contains(head+1)) {
+                        neighborList.add(head+1);
+                    }
+                    if (!path.contains(head-sideLength)) {
+                        neighborList.add(head-sideLength);
+                    }
+                    if (!path.contains(head+sideLength)) {
+                        neighborList.add(head+sideLength);
+                    }
+                    break;
+                case "|":
+                    if (!path.contains(head-sideLength)) {
+                        neighborList.add(head-sideLength);
+                    }
+                    if (!path.contains(head+sideLength)) {
+                        neighborList.add(head+sideLength);
+                    }
+                    break;
+                default:
+                    System.exit(0);
+            }
+        } else {
+		    neighborList = new ArrayList<Integer>(Arrays.asList(
+            head-1,head-(sideLength+1),head-(sideLength-1),
+            head-sideLength,head+1,head+(sideLength+1),
+            head+(sideLength-1),head+sideLength)); 
+        
+            //cant remove while iterator over list, so iterate over copy
+            List<Integer> neighborListCopy = new ArrayList(neighborList);
 
-        //cant remove while iterator over list, so iterate over copy
-        List<Integer> neighborListCopy = new ArrayList(neighborList);
+            //remove the neighbors that 
+		    //are out of bounds, or already used
+            Predicate<Integer> p1 = x -> path.contains(x);
+            Predicate<Integer> p2 = x -> x < 0; //to far north
+            Predicate<Integer> p3 = x -> x >= sideLength*sideLength; //too far south    
+            //too far left
+            Predicate<Integer> p4 = x -> head % sideLength == 0 && x % sideLength == sideLength - 1; 
+            //too far right
+            Predicate<Integer> p5 = x -> head % sideLength == sideLength - 1 && x % sideLength == 0;  //too far right
+             Predicate<Integer> p = (((p1.or(p2)).or(p3)).or(p4)).or(p5);
 
-        //remove the neighbors that 
-		//are out of bounds, or already used
-        Predicate<Integer> p1 = x -> path.contains(x);
-        Predicate<Integer> p2 = x -> x < 0; //to far north
-        Predicate<Integer> p3 = x -> x >= sideLength*sideLength; //too far south    
-        //too far left
-        Predicate<Integer> p4 = x -> head % sideLength == 0 && x % sideLength == sideLength - 1; 
-        //too far right
-        Predicate<Integer> p5 = x -> head % sideLength == sideLength - 1 && x % sideLength == 0;  //too far right
-        Predicate<Integer> p = (((p1.or(p2)).or(p3)).or(p4)).or(p5);
-
-        neighborListCopy.stream()
-            .filter(p) 
-            .forEach((x) -> { neighborList.remove(Integer.valueOf(x));}
+            neighborListCopy.stream()
+                .filter(p) 
+                .forEach((x) -> { neighborList.remove(Integer.valueOf(x));}
             );
+        }
+
 		return neighborList;
 		
 	}
@@ -280,10 +303,13 @@ public class ClassicSolver implements Solver {
 	 */
 	private String pathToString(List<Integer> numPath,List<String> faces){
 		int pathLength = numPath.size();
+        List<String> links = Arrays.asList("+","-","|");
 		String pathString = "";
 		for (int i = 0; i < pathLength; i++) {
 			String c = faces.get(numPath.get(i));
-			pathString += c;
+            if (!links.contains(c)) {
+			    pathString += c;
+            }
 		}
 		return pathString;
 	}

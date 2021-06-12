@@ -9,6 +9,8 @@ public class BoardFactory {
             return new ReduxBoard(size);
           case "Music":
             return new MusicBoard(size);
+          case "Links":
+            return new LinksBoard(size);
           default: 
             return new ClassicBoard(size);
         }

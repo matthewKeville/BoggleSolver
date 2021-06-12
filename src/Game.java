@@ -83,44 +83,18 @@ public class Game{
 
     public void renderEndGame() { 
         String body = "\n ------- Words Found -------\n";
-        body += formattedWords(userWords); 
-        Iterator i = (Iterator) userWords.iterator();
-        int score = 0;
-        while (i.hasNext()){
-            String n = (String) i.next();
-            int wl = n.length();
-            switch (wl) {
-                case 3:
-                    score+=1;
-                    break;
-                case 4:
-                    score+=1;
-                    break;
-                case 5:
-                    score+=2;
-                    break;  
-                case 6:
-                    score+=3;
-                    break;
-                case 7:
-                    score+=4;
-                    break;
-                case 8:
-                    score+=11;
-                    break;
-                default:
-                    if (wl>8){      
-                        score+=11; 
-                    }
-                    break;
-            }
-        }
-        double percent =  (double) userWords.size() / (double) gw.getTotalWords();
+        body += formattedWords(userWords);  
+        double percent =  (double) userWords.size() / (double) gw.getNumberOfWords();
         clrScreen(); 
         System.out.println(gw.getBoardDisplay());
         System.out.println("Game Over");
-        System.out.printf("Your Score : %d%n",score);        
+        System.out.printf("Your Score : %d%n",gw.score(userWords));        
         System.out.printf("Percent Of Words Found :  %.2f",percent);
+        System.out.println("Missed Plurals");
+        List<String> missed = gw.missedPlurals(userWords);
+        for (String s: missed) {
+          System.out.println(s);
+        }
         System.out.println(body);
         System.out.println("Press enter to return to the main menu");
         Scanner scan = new Scanner(System.in);
@@ -261,7 +235,7 @@ public class Game{
                       "-------------------\n" + 
                       "Game Type : " + gw.getGameType() + "\n" +
                       "Board Size : " + gw.getSize() + "\n" +
-                      "Board Density : " + gw.getTotalWords() + "\n"  +
+                      "Board Density : " + gw.getNumberOfWords() + "\n"  +
                       "Time Mode : " + (timed ? "[ON]" : "[OFF]") + "\n" +
                       "-------------------\n" + 
                       "[s] Start\n" +
@@ -306,9 +280,11 @@ public class Game{
                     gameResponses.add("c");
                     gameResponses.add("r");
                     gameResponses.add("m");
+                    gameResponses.add("l");
                     String gameQuery = "Pick the new game type\n" +
                                    "[c] classic : traditional boggle \n" +
                                    "[r] redux : boggle with blocks #, and free spaces * \n" +
+                                   "[l] links : boggle with transitions \n" +
                                    "[m] music : find musical chords \n";
                     String newGameCode = queryResponse(gameResponses,gameQuery); 
                     String newGameType;
@@ -321,6 +297,9 @@ public class Game{
                             break;
                         case "m":
                             newGameType = "Music";
+                            break;
+                        case "l":
+                            newGameType = "Links";
                             break;
                         default:
                             newGameType = "Classic";

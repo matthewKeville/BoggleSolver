@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Collections;
 import java.util.Set;
 import java.util.Iterator;
+import java.util.*;
 import java.util.stream.*;
 import java.util.function.*; //for predicate
 /**
@@ -36,11 +37,11 @@ import java.util.function.*; //for predicate
  *			&& the path uses the indices of the board only once
  *
  */
-public class ClassicSolver implements Solver {
+public class ReduxSolver implements Solver {
 
 	private List<String> words;//List of legal words
 
-	public ClassicSolver(List<String> words) {
+	public ReduxSolver(List<String> words) {
 		this.words = words;
 	}
 	
@@ -61,30 +62,43 @@ public class ClassicSolver implements Solver {
 		//solve the board
 		List frontier = new ArrayList<List<Integer>>();
 		for (int i = 0; i < faces.size(); i ++) {
-			frontier.add( new ArrayList<Integer>(Arrays.asList(i)));
+            if (!faces.get(i).equals("#")) {
+			    frontier.add( new ArrayList<Integer>(Arrays.asList(i)));
+            }
 		}
 		
 		List closed = new ArrayList<List<Integer>>();
 
 		List<List<List<Integer>>> result = bogglePath(frontier,closed,faces);
 		List<List<Integer>> wordPaths = result.get(1);
-
         Map<String,List<List<Integer>>> solution = new HashMap();
-	
-        for(List<Integer> L : wordPaths) {
-            String tmp = pathToString(L,faces);
+        //	
+        //unpack solution	
+        //
+        
+		for(List<Integer> L : wordPaths) {
+            List<String> tmpStrings = pathToString(L,faces);
             List<List<Integer>> paths;
-            if (solution.containsKey(tmp)) {
-                    paths = solution.get(tmp);
-                    paths.add(L);
-                    solution.put(tmp,paths);
-            } else {
-                    paths = new ArrayList();
-                    paths.add(L);
-                    solution.put(tmp,paths);
-            }   
-               
-        }   
+			for (String tmp : tmpStrings) {
+                if (isWord(tmp)) {
+		            if (solution.containsKey(tmp)) {
+                        paths = solution.get(tmp);
+                        paths.add(L);
+                        solution.put(tmp,paths);
+                    } else {
+                        paths = new ArrayList();
+                        paths.add(L);
+                        solution.put(tmp,paths);
+                    }
+                }
+            }
+		}
+        //Create a solution map that maps words to ways to find
+        for (List<Integer> L : wordPaths) {
+            
+        }
+        List<List<Integer>> wayToFind = new ArrayList();
+
 		
 		return solution;
 	}
@@ -123,20 +137,35 @@ public class ClassicSolver implements Solver {
 				List<Integer> path_i = new ArrayList(path);
 				path_i.add(neighbors.get(i));
 				//ensure this path might be an English Word
-				if (isPartialWord(pathToString(path_i,faces))) {
-					neighborPaths.add(path_i);
-				}
+                List<String> potentials = pathToString(path_i,faces);
+                boolean isPartial = false;
+                for (String l : potentials) {
+				    if (isPartialWord(l)) {
+                       isPartial = true; 
+				    }
+                }
+                if (isPartial) {
+                    neighborPaths.add(path_i);
+                }
 			}
 			//add all of the neighboring paths to the new frontier
 			newFrontier.addAll(neighborPaths);
-			//add the current path to the closed if its valid
-			if(isWord(pathToString(path,faces))){
-				closed.add(path);
-			}
+			//add the current path strings to the closed if its valid
+            List<String> closedWords =  pathToString(path,faces);
+            boolean isWord = false;
+            for (String s : closedWords) {
+			    if(isWord(s)){
+				  isWord = true;    
+                }
+            }
+            if (isWord) {
+                closed.add(path);
+            }
 		}
 		
 		if(newFrontier.size()!=0) {						//recursive case
 			return bogglePath(newFrontier,closed,faces);
+            
 		}else{											//base case
 			List<List<List<Integer>>> end = new ArrayList<List<List<Integer>>>();
 			end.add(newFrontier);
@@ -147,7 +176,6 @@ public class ClassicSolver implements Solver {
 	}
 	
 	//return the valid neighbors of the path
-    
 	protected List<Integer> getNeighbors(List<Integer> path,List<String> faces) {
         int sideLength = (int) Math.sqrt(faces.size());
 		int pathLength = path.size();
@@ -160,7 +188,6 @@ public class ClassicSolver implements Solver {
           head-sideLength,head+1,head+(sideLength+1),
           head+(sideLength-1),head+sideLength)); 
 
-        //cant remove while iterator over list, so iterate over copy
         List<Integer> neighborListCopy = new ArrayList(neighborList);
 
         //remove the neighbors that 
@@ -169,10 +196,16 @@ public class ClassicSolver implements Solver {
         Predicate<Integer> p2 = x -> x < 0; //to far north
         Predicate<Integer> p3 = x -> x >= sideLength*sideLength; //too far south    
         //too far left
-        Predicate<Integer> p4 = x -> head % sideLength == 0 && x % sideLength == sideLength - 1; 
+        Predicate<Integer> p4 = x -> head % sideLength == 0 && x % sideLength == sideLength - 1;  
         //too far right
         Predicate<Integer> p5 = x -> head % sideLength == sideLength - 1 && x % sideLength == 0;  //too far right
-        Predicate<Integer> p = (((p1.or(p2)).or(p3)).or(p4)).or(p5);
+
+        //Block tiles
+        Predicate<Integer> pb = x -> faces.get(x).equals("#");
+
+        
+
+        Predicate<Integer> p = ((((p1.or(p2)).or(p3)).or(p4)).or(p5)).or(pb);
 
         neighborListCopy.stream()
             .filter(p) 
@@ -273,19 +306,35 @@ public class ClassicSolver implements Solver {
 		
 	
 	/**converts the numerical path to a string
-	 * !the letter q will be substituted with qu
-	 * 
+	 * Since Redux introduces * character, pathToString 
+     * no returns multiple strings
 	 * @param numPath
 	 * @return the string represented by the path
 	 */
-	private String pathToString(List<Integer> numPath,List<String> faces){
-		int pathLength = numPath.size();
-		String pathString = "";
-		for (int i = 0; i < pathLength; i++) {
-			String c = faces.get(numPath.get(i));
-			pathString += c;
-		}
-		return pathString;
+	private List<String> pathToString(List<Integer> numPath,List<String> faces){
+        List<String> pathStrings = new ArrayList();
+        pathStrings.add(""); 
+
+        for (int i = 0; i < numPath.size(); i++) {
+            List<String> copy = new ArrayList(pathStrings);
+            pathStrings.clear();
+            if (faces.get(numPath.get(i)).equals("*")) {
+               for (String s : copy) {
+                   for (int j = 97; j <= 122; j++) {
+                       //only add the string if its potentially a real word
+                       if (isPartialWord(s+Character.toString( (char) j))) {
+                           pathStrings.add( s + Character.toString((char) j));  
+                       }
+                    }
+               } 
+            }
+            else {
+                for (String s : copy) {
+                   pathStrings.add(s+faces.get(numPath.get(i))); 
+                }
+            }
+        }
+		return pathStrings;
 	}
 	
 	

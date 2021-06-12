@@ -16,7 +16,9 @@ public class SolverFactory {
             case "Classic":
                 return new ClassicSolver(words);
             case "Redux":
-                return new ClassicSolver(words);
+                return new ReduxSolver(words);
+            case "Links":
+                return new LinksSolver(words);
             default: 
                 return new ClassicSolver(words);
         }

@@ -32,7 +32,7 @@ public class GameWarden {
     private BoardPrinter bp;
     private SolverFactory sf;
 
-    private Map<List<Integer>,String> solution;
+    private Map<String,List<List<Integer>>> solution;
     private List<String> uniqueWords;
 
     private Board board;
@@ -82,13 +82,7 @@ public class GameWarden {
     
     public  void setGameType(String gameType) {
         this.gameType = gameType;
-        switch (this.gameType) {
-            case "Classic":
-              this.bs = sf.getInstance(this.gameType);
-              break;
-            default:
-              System.exit(0);
-            }
+        this.bs = sf.getInstance(this.gameType);
     }
 
     //add a field called display type to change board display
@@ -114,16 +108,14 @@ public class GameWarden {
     }
    
 
-    //Stats
-    public int getSolutionSize() {
-        return solution.size();
-    }
-
     public List<String> getUniqueWords() {
         return uniqueWords;
     }
-    
-    public int getTotalWords() {
+   
+
+    //stats
+ 
+    public int getNumberOfWords() {
         return uniqueWords.size();
     }
 
@@ -134,10 +126,38 @@ public class GameWarden {
 	}
 
     //score a single user
+    /* 3,4 -1 , 5 -2 , 6-3, 7 -4 , 8+ - 11
+    */
     public int score(List<String> userWords) {
         //todo
-        return 0;
+        int score  = 0;
+        for (String s : userWords) 
+        {
+          if (s.length() < 4) {
+            score+=1;
+          } else if (s.length() < 5) {
+            score+=2;
+          } else if (s.length() < 6) {
+            score+=3;
+          } else if (s.length() < 7) {
+            score+=4;
+          } else {
+            score+=11;
+          }
+        }
+        return score;
     }
+
+    public List<String> missedPlurals(List<String> userWords) {
+        List<String> missed = new ArrayList();
+        for (String s : userWords) {
+            String ps = s.concat("s");
+            if (uniqueWords.contains(ps) && !userWords.contains(ps) ) {
+                missed.add(ps);
+            }
+        } 
+        return missed; 
+    } 
    
     //score a set of users at the same time | factors duplicate words 
     public List<Integer> scoreParty(List<List<String>> userWords) {

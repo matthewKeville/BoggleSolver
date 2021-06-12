@@ -2,9 +2,12 @@ src/Board.java
 src/BoardFactory.java
 src/ClassicBoard.java
 src/ReduxBoard.java
+src/LinksBoard.java
 src/BoardPrinter.java
 src/Solver.java
 src/ClassicSolver.java
+src/ReduxSolver.java
+src/LinksSolver.java
 src/Runner.java
 src/Game.java
 src/GameWarden.java

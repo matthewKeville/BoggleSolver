@@ -35,7 +35,7 @@ public class ReduxBoard extends ClassicBoard {
     public void mutate() {
         Random rand = new Random();
         //int specialTiles = rand.nextInt(5) + 1;
-        double coverage = .20*faces.size();
+        double coverage = .10*faces.size();
         int specialTiles = (int) (rand.nextGaussian()*(coverage) + coverage);
         while (specialTiles != 0) {
           //pick a random index
