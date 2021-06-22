@@ -13,5 +13,8 @@ src/client/gui/Boggle.java
 src/client/cli/Boggle.java
 src/client/gui/BoardView.java
 src/client/gui/AnswerView.java
-src/client/gui/AnswerInputPanel.java
+src/client/gui/GameMenuView.java
+src/client/gui/AnswerInputView.java
+src/client/gui/SinglePlayerView.java
+src/client/gui/SinglePlayerController.java
 src/controller/GameWarden.java

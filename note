@@ -1,3 +1,5 @@
-removed Stat
-removed boggleService
-from targets
+JTable is not suiting my needs, It seems unnecessarily complex to have it display data that is not associated 
+by fixed dimensions. I will look into making a custom table ( from JPanel and JLabel ) to avoid the 
+complexity of JTable.
+
+If row data was consistent, or column data it would make sense , but not for boggle

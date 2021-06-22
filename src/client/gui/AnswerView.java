@@ -8,140 +8,216 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.List;
-import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.JList;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
 
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import java.util.stream.*;
 import java.util.Map;
+import java.util.Set;
 
 import board.*;
 import solver.*;
 
 public class AnswerView extends JPanel {
 
+  private Color orangeRed = new Color(255,69,0);
+  
+  private int minSize = 3;
+  //words greater than or equal to will be put
+  //in the same column of maxSize
+  private int maxSize = 7;
+
+  private Map<Integer,JList> jlistBySize;
+
   public AnswerView() {
     super();
+    jlistBySize = new HashMap();
     this.setPreferredSize(new Dimension(400,400));
-    //docs reccomend using gridlayout or borderlayout for single item containers
-    GridLayout glone = new GridLayout(1,1);
-    glone.setHgap(8);
-    this.setLayout(glone);
+    this.setBackground(orangeRed);
+    this.setOpaque(true);
+    this.setLayout(new GridBagLayout());
     create();
   }
 
+  public AnswerView(List<String> answers) {
+    super();
+    jlistBySize = new HashMap();
+    this.setPreferredSize(new Dimension(400,400));
+    this.setBackground(Color.RED);
+    this.setOpaque(true);
+    this.setLayout(new GridBagLayout());
+    createFrom(answers);
+  }
+
+
+  public void clear() {
+    removeAll();
+    revalidate(); //let layout manager know 
+    create();//create empty JLists
+    repaint(); //update stale display
+  }
+
+  public void addAnswer(String ans) {
+    //get the jlist  that corresponds with this length and
+    //change the backing listModel 
+    if ( minSize <= ans.length() && ans.length() < maxSize) {
+        //get the jlist
+        JList<String> staleJList = jlistBySize.get(ans.length());
+        //get the JList model
+        DefaultListModel staleModel = (DefaultListModel) staleJList.getModel();
+        DefaultListModel newModel = new DefaultListModel();
+
+        //create a new ListModel with answer inserted at the correct position 
+        boolean found = false;
+        for (int i = 0; i < staleModel.size(); i++) {
+            //if the current element is larger then new entry insert
+            //there otherwise add existant element at that index to new list
+            if (!found) {
+                if (ans.compareTo(((String)staleModel.getElementAt(i))) <= 0) {
+                    found = true;
+                    newModel.addElement(ans);
+                }
+            }
+            newModel.addElement(staleModel.getElementAt(i));
+        }
+        //if all elements are smaller than new add at end
+        if (!found) {
+            newModel.addElement(ans);
+        }
+        //set the model of the JList
+        staleJList.setModel(newModel);
+        
+    } else if ( ans.length() >= maxSize) {
+        JList<String> staleJList = jlistBySize.get(7);
+        DefaultListModel staleModel = (DefaultListModel) staleJList.getModel();
+        DefaultListModel newModel = new DefaultListModel();
+
+        //create a new ListModel with answer inserted at the correct position 
+        boolean found = false;
+        for (int i = 0; i < staleModel.size(); i++) {
+            //if the current element is larger then new entry insert
+            //there otherwise add existant element at that index to new list
+            if (!found) {
+                if (ans.length() < ((String) staleModel.getElementAt(i)).length()) {
+                    found = true;     
+                } else if (ans.length() == ((String) staleModel.getElementAt(i)).length()) {
+                    if ( ans.compareTo(((String)staleModel.getElementAt(i))) <= 0) {
+                        found = true;
+                    }
+                } 
+                //if newly found , insert at properly location
+                if (found) {
+                    newModel.addElement(ans);
+                }
+            }
+            //otherwise insert the defualt element
+            newModel.addElement(staleModel.getElementAt(i));
+        }
+        //if all elements are smaller than new add at end
+        if (!found) {
+            newModel.addElement(ans);
+        }
+        staleJList.setModel(newModel);
+
+
+    }
+    
+    
+  }
+
+  //create maxSize - minSize empty JLists
   private void create() {
 
     Color oldLace = new Color(.992f,.961f,.902f);
     Color cream = new Color(1.0f,.992f,.816f);
     Font labelFont = new Font("Serif",Font.BOLD,16);
-    //get a 4x4 boggle board
 
-    //String[] columnNames = {"3","4","5","6","7+"};    
-    //Transform the giving list of strings into a map of string length and
-    //ordered lists of strings for each length
-    //List<String> answers = Arrays.asList("cat","cats","corks","frogs","carpets","dogs","puppies","pupiles");
-    List<String> answers = Arrays.asList("cat","cats","corks","frogs","carpets","dogs","puppies","pupiles","stupid","stinky","shawn","is","screadjasfds");
-
-
-
-
-    List<String> answersCopy = new ArrayList(answers);
-    Map<Integer,List<String>> answerByLength = answersCopy.stream()
-    .sorted( (x,y) -> {if (x.length() < y.length()) { 
-                                            return -1;
-                                           } else if (x.length() == y.length()) {
-                                            return  (x.compareTo(y) < 0)?-1:1;  }
-                                           else {
-                                             return 1;
-                                            }})
-    .collect(Collectors.groupingBy(String::length));
-
-    System.out.println(answerByLength);
-
-    int numRows = answerByLength.keySet().stream()
-      .mapToInt( (x) -> answerByLength.get(x).size())
-      .max().getAsInt();
-    System.out.println(numRows);
-
-    int numCols = answerByLength.size();
-    System.out.println("rows " +  numRows + " cols " + numCols); 
-
-
-
-    //JTable jt = new JTable(new AnswerTableModel(data,columnNames));
-    JTable jt = new JTable(new AnswerTableModel(answers));
-    jt.setPreferredSize(new Dimension(400,400));
-    this.add(jt);
+    //create the ListModels and JLists
+    for (int k = minSize; k <= maxSize; k++)
+    {
+        List<String> answerSizeList = new ArrayList(); 
+        JList sizeList = new JList(new DefaultListModel());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = k - minSize;
+        gbc.gridy = 0;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+        this.add(sizeList,gbc);
+        jlistBySize.put(k,sizeList);
+    }
 
   }
 
-  //this model takes in a list of strings and makes a table
-  //where the columns are string lenghts 3 - 7+
-  // the absence of a string will be replaced with an empty string
 
+  //create an AnswerView with an existing answer set
+  private void createFrom(List<String> answers) {
 
-  /* 
-  */
-  class AnswerTableModel extends AbstractTableModel
-  {
-    
-    //private Object[][] data; 
-    private Map<Integer,List<String>> data;
+    Color oldLace = new Color(.992f,.961f,.902f);
+    Color cream = new Color(1.0f,.992f,.816f);
+    Font labelFont = new Font("Serif",Font.BOLD,16);
 
-    public AnswerTableModel(List<String> answerList) {
-        super();
-        //this.columnNames = columnNames;
-        List<String> answerCopy = new ArrayList(answerList);
-        Map<Integer,List<String>> answerByLength = answerCopy.stream()
-        .sorted( (x,y) -> {if (x.length() < y.length()) { 
-                                            return -1;
-                                           } else if (x.length() == y.length()) {
-                                            return  (x.compareTo(y) < 0)?-1:1;  }
-                                           else {
-                                             return 1;
-                                            }})
+    //transform answer list into a map of list of strings indexed by size
+    //orderd alphabetically
+    Map<Integer,List<String>> answersBySize = answers.stream()
+        .filter( (x) -> minSize <= x.length() )
+        .filter( (x) -> x.length() <  maxSize ) 
+        .sorted( (x,y) -> { return x.compareTo(y); })
         .collect(Collectors.groupingBy(String::length));
-        this.data = answerByLength;
-    }
-
-    //abstract table leaves 3 methods to be implemented from TableModel interface
-
-    public int getRowCount() {
-      return data.keySet().stream()
-      .mapToInt( (x) -> data.get(x).size())
-      .max().getAsInt();
-    }
-
-    public int getColumnCount() {
-      int maxLength = data.keySet().stream().max(Integer::compareTo).get();
-      int minLength = data.keySet().stream().min(Integer::compareTo).get();
-      return (maxLength - minLength + 1);
-    }
-
-    //return the rowth string at column , if no string exists return ""
-    public Object getValueAt(int row, int column) {
-      int maxLength = data.keySet().stream().max(Integer::compareTo).get();
-      int minLength = data.keySet().stream().min(Integer::compareTo).get();
-      System.out.println("minLen" + minLength + "maxLen" + maxLength);
-      int lengthIndex = column+minLength;
-      if (data.containsKey(lengthIndex)) {
-        System.out.println(row+ " " + column + "map has it");
-        List<String> equalLength = data.get(lengthIndex);
-        if ( row >= equalLength.size()) {
-            return "";
-        } else {
-            return equalLength.get(row);
+    //for all strings greater than maxSize add them to the 7 list
+    //ordered alphanumerically
+    List<String> maxPlus = answers.stream()
+        .filter( (x) -> x.length() >= maxSize)
+        .sorted( (x,y) -> { //sort alphanumerically
+                            if (x.length() < y.length() ) {
+                                return -1;
+                            } else if (x.length() == y.length()) {
+                                return (x.compareTo(y)<0)?-1:1;
+                            } else {
+                               return 1;
+                            }
+        })
+        .collect(Collectors.toList());
+    answersBySize.put(maxSize,maxPlus);
+    //if any keys in range (minSize,maxSize) 
+    //were not generated implicitly from data 
+    //create dummy entries in the map
+    for ( int i = minSize; i <= maxSize; i++ ) {
+        if (!answersBySize.containsKey(i)) {
+            answersBySize.put(i,new ArrayList<String>());
         }
-      } else {
-        return "";
-      } 
+    }
+
+    System.out.println(answersBySize);
+
+    int i = 0;
+    //create the ListModels and JLists
+    for (Integer k : answersBySize.keySet() )
+    {
+        List<String> answerSizeList = answersBySize.get(k); 
+        DefaultListModel model = new DefaultListModel();
+        answerSizeList.stream()
+        .forEach( (x) -> model.addElement(x)); 
+        JList sizeList = new JList(model);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = i;
+        gbc.gridy = 0;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+        i++;
+        this.add(sizeList,gbc);
+        jlistBySize.put(k,sizeList);
     }
 
   }
-
-
 }

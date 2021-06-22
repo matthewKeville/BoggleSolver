@@ -8,13 +8,17 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.List;
-
+import java.util.ArrayList;
 import board.*;
 import solver.*;
 
 public class BoardView extends JPanel {
 
   private JPanel boardView;
+  private List<JLabel> faceLabels;
+  private Color oldLace = new Color(.992f,.961f,.902f);
+  private Color cream = new Color(1.0f,.992f,.816f);
+
 
   public BoardView() {
     super();
@@ -25,12 +29,52 @@ public class BoardView extends JPanel {
     create();
   }
 
+  //transform the view to represent the given board,
+  //or board state
+  public void setBoard(Board board) {
+    clear();
+    //add a new set of JLabels to the boardview panel
+    createLabels(board); 
+    boardView.repaint();
+  }
+
+    
+
+  public void clear() {
+    boardView.removeAll();
+    boardView.revalidate();
+    if (faceLabels != null) {
+        faceLabels.clear();
+    }
+  }
+
+  private void createLabels(Board board) {
+    //reset or make new JLabel list
+    faceLabels = new ArrayList<JLabel>();
+    //retrieve data from supplied board
+    List<String> faces = board.getFaces();
+    //make labels for all faces, add to boardView
+    //and faceLabel list
+    for (int i = 0; i < faces.size(); i++) {
+      Font labelFont = new Font("SansSerif",Font.BOLD,40);
+      JLabel label = new JLabel(faces.get(i));
+      label.setPreferredSize(new Dimension(2,2));
+      label.setForeground(Color.black);
+      label.setBackground(oldLace);
+      label.setOpaque(true);
+      label.setFont(labelFont);
+      Border lineBorder = BorderFactory.createLineBorder(Color.black,2,true);
+      label.setBorder(lineBorder);
+      label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+      faceLabels.add(label);
+      boardView.add(label); 
+    }
+  }
+
   private void create() {
+    //set up container for labels
 
-    Color oldLace = new Color(.992f,.961f,.902f);
-    Color cream = new Color(1.0f,.992f,.816f);
-
-        //can't seem to find  a margin property , so
+    //can't seem to find  a margin property , so
     //i will have the boardView JPanel nested inside a
     //a JPanel with a border to act as a margin
     //3rd arg is rounded
@@ -44,29 +88,12 @@ public class BoardView extends JPanel {
     boardView = new JPanel(gl);
     boardView.setPreferredSize(new Dimension(400,400));
     boardView.setBackground(Color.blue);
-
-    //get a 4x4 boggle board
-    BoardFactory bf = new BoardFactory();
-    Board testBoard = bf.getInstance(4,"Classic");
-    List<String> faces = testBoard.getFaces();
-    for (int i = 0; i < faces.size(); i++) {
-      Font labelFont = new Font("SansSerif",Font.BOLD,40);
-
-      JLabel label = new JLabel(faces.get(i));
-      label.setPreferredSize(new Dimension(2,2));
-      label.setForeground(Color.black);
-      label.setBackground(oldLace);
-      label.setOpaque(true);
-      label.setFont(labelFont);
-      Border lineBorder = BorderFactory.createLineBorder(Color.black,2,true);
-      label.setBorder(lineBorder);
-      label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-      boardView.add(label); 
-    }
-
+    //add to parent 
     this.add(boardView);
-
+    
   }
+
+
 
 
 }
