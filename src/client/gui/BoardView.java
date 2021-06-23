@@ -26,7 +26,6 @@ public class BoardView extends JPanel {
     GridLayout glone = new GridLayout(1,1);
     this.setLayout(glone);
     this.setPreferredSize(new Dimension(400,400));
-    create();
   }
 
   //transform the view to represent the given board,
@@ -34,21 +33,42 @@ public class BoardView extends JPanel {
   public void setBoard(Board board) {
     clear();
     //add a new set of JLabels to the boardview panel
-    createLabels(board); 
+    create(board); 
     boardView.repaint();
   }
 
     
 
   public void clear() {
-    boardView.removeAll();
-    boardView.revalidate();
+    //boardView.removeAll();
+    //boardView.revalidate();
+    removeAll();
+    revalidate();
     if (faceLabels != null) {
         faceLabels.clear();
     }
   }
 
-  private void createLabels(Board board) {
+  private void create(Board board) {
+    //set up container for labels
+    //can't seem to find  a margin property , so
+    //i will have the boardView JPanel nested inside a
+    //a JPanel with a border to act as a margin
+    //3rd arg is rounded
+    Border paddingBorder = BorderFactory.createLineBorder(Color.blue,8,true);
+    this.setBorder(paddingBorder);
+
+
+    GridLayout gl = new GridLayout(board.getSize(),board.getSize()); 
+    gl.setHgap(4);
+    gl.setVgap(4);
+    
+    boardView = new JPanel(gl);
+    boardView.setPreferredSize(new Dimension(400,400));
+    boardView.setBackground(Color.blue);
+    //add to parent 
+    this.add(boardView);
+
     //reset or make new JLabel list
     faceLabels = new ArrayList<JLabel>();
     //retrieve data from supplied board
@@ -69,27 +89,7 @@ public class BoardView extends JPanel {
       faceLabels.add(label);
       boardView.add(label); 
     }
-  }
 
-  private void create() {
-    //set up container for labels
-
-    //can't seem to find  a margin property , so
-    //i will have the boardView JPanel nested inside a
-    //a JPanel with a border to act as a margin
-    //3rd arg is rounded
-    Border paddingBorder = BorderFactory.createLineBorder(Color.blue,8,true);
-    this.setBorder(paddingBorder);
-
-    GridLayout gl = new GridLayout(4,4); 
-    gl.setHgap(4);
-    gl.setVgap(4);
-    
-    boardView = new JPanel(gl);
-    boardView.setPreferredSize(new Dimension(400,400));
-    boardView.setBackground(Color.blue);
-    //add to parent 
-    this.add(boardView);
     
   }
 

@@ -30,6 +30,7 @@ public class GameMenuView extends JPanel {
   private JButton leftButton;
   private JButton rightButton;
   private JButton shakeButton;
+  private JButton exitGameButton;
 
 
   public GameMenuView() {
@@ -74,11 +75,17 @@ public class GameMenuView extends JPanel {
     gbc.weighty =1;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     gbc.anchor = GridBagConstraints.FIRST_LINE_START;
-    this.add(shakeButton,gbc); 
-
-
-
-    
+    this.add(shakeButton,gbc);
+    //quit 
+    exitGameButton = new JButton("Exit Game");
+    gbc = new GridBagConstraints();
+    gbc.gridx = 3;
+    gbc.gridy = 0;
+    gbc.weightx =1;
+    gbc.weighty =1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+    this.add(exitGameButton,gbc);
 
   }
 
@@ -94,6 +101,10 @@ public class GameMenuView extends JPanel {
 
   public void addShakeListener(ActionListener shakeListener) {
     shakeButton.addActionListener(shakeListener);
+  }
+    
+  public void addExitGameListener(ActionListener quitListener) {
+    exitGameButton.addActionListener(quitListener);
   }
 
 

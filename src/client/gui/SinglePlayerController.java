@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import java.awt.FlowLayout;
+import java.awt.CardLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 
@@ -23,30 +24,33 @@ import solver.*;
 
 public class SinglePlayerController {
 
-  private List<String> userAnswers;
-  private Board board;
-  private BoardFactory bf;
   private SinglePlayerView spv;
-  private SolverFactory sf;
-  private Solver bs;
-  private List<String> solutionList; 
+  private SinglePlayerModel spm;
 
-  public SinglePlayerController(SinglePlayerView spv) {
+  public SinglePlayerController(SinglePlayerView spv,SinglePlayerModel spm) {
     super();
+
     this.spv = spv;
-    this.bf = new BoardFactory();
-    this.board = bf.getInstance(4,"Classic");
-    this.spv.getBoardView().setBoard(board);
-    
-    this.userAnswers = new ArrayList();   
-    this.sf = new SolverFactory("src/res/corncob_lowercase.txt");
-    this.bs = sf.getInstance("Classic");
-    this.solutionList = this.bs.solveWords(this.board);
- 
-    //Add actionListener to answer input view
-    //let anserview (hybrid v-c) know to update 
+    this.spm = spm;
+    //set default model fields 
+   
+    //set default view in accordance with model
+    spv.getAnswerView().createEmptyAnswerMap(spm.getMinAnswerSize(),spm.getMaxAnswerSize()); 
+
+    //update all views to reflect there model
+    //updateBoardView(); 
+
+
+    // When the view says a new word is trying to be added,
+    // check the validity of this word. 
+    // tell the SinglePlayer Model to update its state
+    // tell the SinglePlayer View to  update it visual
+    // use the GameMenu Controller to update it's model
+    // use the GameMenu Controller to update it's view (response Label)
+
     spv.getAnswerInputView().addNewWordListener(new ActionListener()
     {
+        //adjust to adhere to answer constraints in the model
         public void actionPerformed(ActionEvent e)
         {
             boolean valid = true;
@@ -60,19 +64,19 @@ public class SinglePlayerController {
                valid = false; 
             }
             //check if word is already found
-            if (userAnswers.contains(newWord)) {
+            if (spm.answerExists(newWord)) {
                spv.getAnswerInputView().getResponseLabel().setText("You already found this word!");
                valid = false;
             } 
             //if word is in the answerList
-            if (! solutionList.contains(newWord)) {
+            if (!spm.getSolutionList().contains(newWord)) {
                 valid = false;
                 spv.getAnswerInputView().getResponseLabel().setText(" Umm no , look again ");            
             } 
             //only add if valid
             if (valid) {
-                userAnswers.add(newWord);
-                spv.getAnswerView().addAnswer(newWord); 
+                //spm.addAnser might be out of place, control logic should be in the controller
+                spm.addAnswer(newWord);
                 String response;
                 switch (newWord.length()) {
                     //less than 3 shouldn't pass validity check
@@ -100,9 +104,11 @@ public class SinglePlayerController {
                         break;
                 }
                 spv.getAnswerInputView().getResponseLabel().setText(response);
+                updateAnswerView();
             }
             //always reset the field
             spv.getAnswerInputView().getAnswerField().setText("");
+            //update AnswerView Model
         }
     });
 
@@ -111,14 +117,14 @@ public class SinglePlayerController {
         public void actionPerformed(ActionEvent e)
         {
             System.out.println("Shake Button Pressed");
-            board = bf.getInstance(4,"Classic");
-            spv.getBoardView().setBoard(board);
-
-            solutionList = bs.solveWords(board);
-            //clear internal answers
-            userAnswers.clear();
-            //clear AnswerView
-            spv.getAnswerView().clear();
+            //update the board model // setBoard solves and populates solutionList
+            generateNewGame();
+            //update the board view
+            updateBoardView();
+            //tbd update answerModel
+            spm.resetUserAnswersMap();
+            //tbd update answerView
+            updateAnswerView();
         }
     }); 
 
@@ -127,8 +133,8 @@ public class SinglePlayerController {
         public void actionPerformed(ActionEvent e)
         {
             System.out.println("Rotate Left Button Pressed");
-            board.rotateLeft();
-            spv.getBoardView().setBoard(board);
+            spm.getBoard().rotateLeft();
+            updateBoardView();
         }
     }); 
 
@@ -137,11 +143,68 @@ public class SinglePlayerController {
         public void actionPerformed(ActionEvent e)
         {
             System.out.println("Rotate Right Button Pressed");
-            board.rotateRight();
-            spv.getBoardView().setBoard(board);
+            spm.getBoard().rotateRight();
+            updateBoardView();
         }
     });
 
+    spv.getGameMenuView().addExitGameListener(new ActionListener()
+    {
+        public void actionPerformed(ActionEvent e) 
+        {
+            System.out.println("Exit Game Button Pressed");
+            spm.getSupport().firePropertyChange("singlePlayerActive",false,true);
+        }
+    });
 
   }
+
+  /////////////////////
+  //View update
+  //////////////////////
+
+  private void updateBoardView() {
+    spv.getBoardView().setBoard(spm.getBoard());
+  }
+
+  private void updateAnswerView() {
+    spv.getAnswerView().updateListModels(spm.getUserAnswersMap()); 
+  }
+
+  public void updateAll() {
+    updateBoardView();
+    updateAnswerView();
+  }
+
+
+  /////////////////////////////////////
+  // Called from parent controller
+  //////////////////////////////////////
+  public void generateNewGame() {
+    spm.generateNewGame();
+  }
+
+  public void setBoardSize(int newSize) {
+    spm.setSize(newSize);
+  }
+
+  public void setGameMode(String newMode) {
+    spm.setGameMode(newMode); 
+  }
+
+  public void setActive(boolean x) {
+    spm.setActive(x);
+  }
+
+  public SinglePlayerModel getSinglePlayerModel() {
+    return spm;
+  }
+
+  public SinglePlayerModel getSinglePlayerController() {
+    return spm;
+  }
+
+    
+
+  
 }
