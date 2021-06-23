@@ -10,6 +10,8 @@ import java.awt.GridLayout;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.HashMap;
 
 import java.awt.FlowLayout;
 import java.awt.CardLayout;
@@ -18,6 +20,7 @@ import java.awt.GridBagConstraints;
 
 import board.*;
 import solver.*;
+import utility.AudioPlayer;
 
 //Listens for changes to the model 
 //and applys them to the views
@@ -27,11 +30,34 @@ public class SinglePlayerController {
   private SinglePlayerView spv;
   private SinglePlayerModel spm;
 
+  //sound stuff
+  private AudioPlayer audioPlayer;  
+
   public SinglePlayerController(SinglePlayerView spv,SinglePlayerModel spm) {
     super();
 
     this.spv = spv;
     this.spm = spm;
+
+    //create Audio Player
+    Map<String,String> audioFileMap = new HashMap();
+    String prefix = "src/res/sound/";
+    audioFileMap.put("nice",prefix+"validwordlow.wav");
+    audioFileMap.put("great",prefix+"validwordmedium.wav");
+    audioFileMap.put("impressive",prefix+"validwordhigh.wav");
+    audioFileMap.put("excellent",prefix+"validwordtall.wav");
+    audioFileMap.put("incredible",prefix+"validwordtop.wav");
+    audioFileMap.put("bad",prefix+"badword.wav");
+    audioFileMap.put("shake",prefix+"shake.wav");
+    audioFileMap.put("rotate",prefix+"rotate.wav");
+    audioFileMap.put("background",prefix+"gameMusic.wav");
+    audioPlayer = new AudioPlayer(audioFileMap);
+    //audioPlayer.play("background");
+    //this audio - background is very loud.
+    //I need to rethink the audioPlayer, and its usage.
+    //I would like to be able to disable , sound sets, or music
+    //or in the main menu have sliders to adjust volume
+
     //set default model fields 
    
     //set default view in accordance with model
@@ -51,13 +77,19 @@ public class SinglePlayerController {
     spv.getAnswerInputView().addNewWordListener(new ActionListener()
     {
         //adjust to adhere to answer constraints in the model
+        //  Warning! Response output is not cohesive with the model
+        //  it is using arbitray scoring values
+        //  the game mdoe and game type should hold
+        //  or dictate how differnt word lengths should be processed
         public void actionPerformed(ActionEvent e)
         {
+            
             boolean valid = true;
             System.out.println("Add New Word Attempt");
             //trim leading and trailing ws
             String newWord = spv.getAnswerInputView().getAnswerField().getText(); 
             newWord = newWord.trim();
+            System.out.println(newWord == null);
             //check if there are spaces in between
             if (newWord.contains(" ")) {
                spv.getAnswerInputView().getResponseLabel().setText("Your word can't contain spaces"); 
@@ -85,27 +117,39 @@ public class SinglePlayerController {
                     //game mode
                     case 3:
                         response = "Nice";
+                        audioPlayer.play("nice");
                         break;
                     case 4:
                         response = "Nice";
+                        audioPlayer.play("nice");
                         break;
                     case 5:
                         response = "Great";
+                        audioPlayer.play("great");
                         break;
                     case 6:
                         response = "Impressive!";
+                        audioPlayer.play("impressive");
                         break;
                     case 7:
                         response = "Excellent!";
+                        audioPlayer.play("excellent");
                         break;
                     //7 +
                     default: 
                         response = "Incredible !!!";
+                        audioPlayer.play("incredible");
                         break;
                 }
+                
+                
                 spv.getAnswerInputView().getResponseLabel().setText(response);
                 updateAnswerView();
+                 
+            } else {
+                audioPlayer.play("bad");
             }
+            
             //always reset the field
             spv.getAnswerInputView().getAnswerField().setText("");
             //update AnswerView Model
@@ -125,6 +169,7 @@ public class SinglePlayerController {
             spm.resetUserAnswersMap();
             //tbd update answerView
             updateAnswerView();
+            audioPlayer.play("shake");
         }
     }); 
 
@@ -135,6 +180,7 @@ public class SinglePlayerController {
             System.out.println("Rotate Left Button Pressed");
             spm.getBoard().rotateLeft();
             updateBoardView();
+            audioPlayer.play("rotate");
         }
     }); 
 
@@ -145,6 +191,7 @@ public class SinglePlayerController {
             System.out.println("Rotate Right Button Pressed");
             spm.getBoard().rotateRight();
             updateBoardView();
+            audioPlayer.play("rotate");
         }
     });
 
@@ -158,6 +205,7 @@ public class SinglePlayerController {
     });
 
   }
+
 
   /////////////////////
   //View update

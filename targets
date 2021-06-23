@@ -25,3 +25,4 @@ src/client/gui/MainMenuController.java
 src/client/gui/BoggleController.java
 src/client/gui/BoggleModel.java
 src/controller/GameWarden.java
+src/utility/AudioPlayer.java

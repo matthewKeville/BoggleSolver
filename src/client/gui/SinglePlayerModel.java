@@ -120,6 +120,7 @@ public class SinglePlayerModel{
 
   //Check if the word is already in the userAnswerMap
   public boolean answerExists(String ans) {
+    if (ans.length() < minAnswerSize) { return false; }
     List<String> answersOfSameSize = (ans.length()<maxAnswerSize)?userAnswersMap.get(ans.length()):userAnswersMap.get(maxAnswerSize);
     return answersOfSameSize.contains(ans);
   }
