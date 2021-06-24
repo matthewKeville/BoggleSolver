@@ -26,3 +26,12 @@ src/client/gui/BoggleController.java
 src/client/gui/BoggleModel.java
 src/controller/GameWarden.java
 src/utility/AudioPlayer.java
+src/utility/AudioEvent.java
+src/utility/AudioEventListener.java
+src/utility/AddAudioSourceEvent.java
+src/utility/PlayClipEvent.java
+src/utility/AddAudioSourceEvent.java
+src/utility/MuteClipEvent.java
+src/utility/MuteClipGroupEvent.java
+src/utility/LoopClipEvent.java
+src/test/AudioTest.java

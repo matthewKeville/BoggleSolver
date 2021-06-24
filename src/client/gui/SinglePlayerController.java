@@ -40,6 +40,7 @@ public class SinglePlayerController {
     this.spm = spm;
 
     //create Audio Player
+    /*
     Map<String,String> audioFileMap = new HashMap();
     String prefix = "src/res/sound/";
     audioFileMap.put("nice",prefix+"validwordlow.wav");
@@ -52,6 +53,7 @@ public class SinglePlayerController {
     audioFileMap.put("rotate",prefix+"rotate.wav");
     audioFileMap.put("background",prefix+"gameMusic.wav");
     audioPlayer = new AudioPlayer(audioFileMap);
+    */
     //audioPlayer.play("background");
     //this audio - background is very loud.
     //I need to rethink the audioPlayer, and its usage.
@@ -117,28 +119,28 @@ public class SinglePlayerController {
                     //game mode
                     case 3:
                         response = "Nice";
-                        audioPlayer.play("nice");
+                        //audioPlayer.play("nice");
                         break;
                     case 4:
                         response = "Nice";
-                        audioPlayer.play("nice");
+                        //audioPlayer.play("nice");
                         break;
                     case 5:
                         response = "Great";
-                        audioPlayer.play("great");
+                        //audioPlayer.play("great");
                         break;
                     case 6:
                         response = "Impressive!";
-                        audioPlayer.play("impressive");
+                        //audioPlayer.play("impressive");
                         break;
                     case 7:
                         response = "Excellent!";
-                        audioPlayer.play("excellent");
+                        //audioPlayer.play("excellent");
                         break;
                     //7 +
                     default: 
                         response = "Incredible !!!";
-                        audioPlayer.play("incredible");
+                        //audioPlayer.play("incredible");
                         break;
                 }
                 
@@ -147,7 +149,7 @@ public class SinglePlayerController {
                 updateAnswerView();
                  
             } else {
-                audioPlayer.play("bad");
+                //audioPlayer.play("bad");
             }
             
             //always reset the field
@@ -169,7 +171,7 @@ public class SinglePlayerController {
             spm.resetUserAnswersMap();
             //tbd update answerView
             updateAnswerView();
-            audioPlayer.play("shake");
+            //audioPlayer.play("shake");
         }
     }); 
 
@@ -180,7 +182,7 @@ public class SinglePlayerController {
             System.out.println("Rotate Left Button Pressed");
             spm.getBoard().rotateLeft();
             updateBoardView();
-            audioPlayer.play("rotate");
+            //audioPlayer.play("rotate");
         }
     }); 
 
@@ -191,7 +193,7 @@ public class SinglePlayerController {
             System.out.println("Rotate Right Button Pressed");
             spm.getBoard().rotateRight();
             updateBoardView();
-            audioPlayer.play("rotate");
+            //audioPlayer.play("rotate");
         }
     });
 
