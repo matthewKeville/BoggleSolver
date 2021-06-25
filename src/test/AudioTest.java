@@ -50,34 +50,53 @@ public class AudioTest {
         String sfxGroup = "sfx";
         String musicGroup = "music";
         in.addListener(ap);
-        in.fireAudioEvent(new AddAudioSourceEvent("validword",null,"src/res/sound/validwordlow.wav"));
-        in.fireAudioEvent(new AddAudioSourceEvent("shake",musicGroup,"src/res/sound/shake.wav"));
-        in.fireAudioEvent(new AddAudioSourceEvent("music",sfxGroup,"src/res/sound/gameMusic.wav"));
-        in.fireAudioEvent(new AddAudioSourceEvent("piano",sfxGroup,"src/res/sound/sadpiano.wav"));
- 
-        //loop shake and valid run for 3 seconds
-        in.fireAudioEvent(new LoopClipEvent("piano",1));
-        in.fireAudioEvent(new LoopClipEvent("shake",1));
-        //in.fireAudioEvent(new LoopClipEvent("validword",1));
 
+        in.fireAudioEvent(new AddAudioSourceEvent("validword",sfxGroup,"src/res/sound/validwordlow.wav",.5f));
+        in.fireAudioEvent(new AddAudioSourceEvent("shake",sfxGroup,"src/res/sound/shake.wav",.5f));
+        in.fireAudioEvent(new AddAudioSourceEvent("tech",musicGroup,"src/res/sound/gameMusic.wav",.5f));
+        in.fireAudioEvent(new AddAudioSourceEvent("piano",musicGroup,"src/res/sound/sadpiano.wav",.5f));
+
+
+ 
         try {
+
+        
+        in.fireAudioEvent(new LoopClipEvent("shake"));
+
+        
         //stop shake loop after 3 seconds
         Thread.sleep(3000);
-        in.fireAudioEvent(new MuteClipEvent("shake",true));
-        //after another 3 seconds stop validword and start shake
+        in.fireAudioEvent(new LoopClipEvent("tech"));
+        //Thread.sleep(3000);
+        //in.fireAudioEvent(new MuteClipEvent("piano",true));
+        //Thread.sleep(4000);
+        
         Thread.sleep(3000);
-        //in.fireAudioEvent(new MuteClipEvent("validword",true));
-        //in.fireAudioEvent(new MuteClipEvent("shake",false));
-        in.fireAudioEvent(new MuteClipEvent("piano",true));
+        in.fireAudioEvent(new LoopClipEvent("validword"));
 
-        Thread.sleep(5000);
+        Thread.sleep(3000);
+        in.fireAudioEvent(new MuteClipGroupEvent(sfxGroup,true));
 
-                
-        in.fireAudioEvent(new MuteClipEvent("piano",false));
+        //in.fireAudioEvent(new MuteClipEvent("music",true));
+
+
+        //Thread.sleep(4000);
+
+        //in.fireAudioEvent(new VolumeClipEvent("music",1f));
+        //in.fireAudioEvent(new PlayClipEvent("music"));
+        //Thread.sleep(4000);                
+
+
+        //in.fireAudioEvent(new VolumeClipEvent("music",.4f));
+
+
+        //in.fireAudioEvent(new MuteClipEvent("music",false));
         
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
+
                 
     }
 

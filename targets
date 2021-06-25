@@ -34,4 +34,7 @@ src/utility/AddAudioSourceEvent.java
 src/utility/MuteClipEvent.java
 src/utility/MuteClipGroupEvent.java
 src/utility/LoopClipEvent.java
+src/utility/VolumeClipEvent.java
+src/utility/Playable.java
+src/utility/Audio.java
 src/test/AudioTest.java
