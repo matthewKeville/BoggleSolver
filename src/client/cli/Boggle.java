@@ -1,4 +1,5 @@
 package client.cli;
+
 import java.util.Scanner;
 import java.util.Iterator;
 import java.util.ArrayList;
@@ -10,8 +11,10 @@ import java.util.Collections;
 import java.util.Random;
 import java.io.FileWriter;
 
-import board.*;
-import solver.*;
+
+/////////////////////
+import model.board.*;
+import model.solver.*;
 import controller.GameWarden;
 
 public class Boggle{

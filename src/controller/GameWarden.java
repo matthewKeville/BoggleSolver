@@ -8,8 +8,8 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.Iterator;
 
-import board.*;
-import solver.*;
+import model.board.*;
+import model.solver.*;
 
 /**
  * @author matthewkeville

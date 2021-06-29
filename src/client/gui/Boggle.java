@@ -1,5 +1,16 @@
 package client.gui;
-import utility.AudioPlayer;
+
+//////////////////////
+import controller.SinglePlayerController;
+import controller.MainMenuController;
+import controller.BoggleController;
+import controller.AudioPlayer;
+import view.SinglePlayerView;
+import view.MainMenuView;
+import view.BoggleView;
+import model.BoggleModel;
+import model.SinglePlayerModel;
+import model.MainMenuModel;
 //Create all the MVC's
 public class Boggle {
 

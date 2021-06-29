@@ -1,5 +1,8 @@
 package test;
-import utility.*;
+
+import model.audio.*;
+import controller.AudioPlayer;
+
 import java.util.concurrent.TimeUnit;
 /* This class tests if Audio Events 
    and Listeners are properly implemented
