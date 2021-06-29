@@ -157,6 +157,16 @@ public class SinglePlayerController implements ModelChangeListener {  //implemen
         }
     });
 
+    spv.getGameMenuView().addEndListener(new ActionListener() 
+    {
+        public void actionPerformed(ActionEvent e)
+        {
+            System.out.println("End Game Button Pressed");
+            spm.end();
+        }
+    });
+            
+
   }
 
 
@@ -237,11 +247,14 @@ public class SinglePlayerController implements ModelChangeListener {  //implemen
   /////////////////////////////////////
   // Called from parent controller
   //////////////////////////////////////
-  /*
-  public void generateNewGame() {
-    spm.generateNewGame();
+
+  //instead of wrapping calls to change the model in
+  //methods of this controller, why not let the parent
+  //controller directrly call methods on the model
+
+  public void setTimed(boolean x) {
+    spm.setTimed(x);
   }
-  */
 
   public void setBoardSize(int newSize) {
     spm.setSize(newSize);

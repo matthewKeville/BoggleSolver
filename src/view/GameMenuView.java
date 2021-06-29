@@ -24,10 +24,11 @@ public class GameMenuView extends JPanel {
 
   //private Color gold = new Color(255,215,0);  
 
-  private JButton leftButton;
-  private JButton rightButton;
-  private JButton shakeButton;
-  private JButton exitGameButton;
+  private JButton leftButton; //rotate
+  private JButton rightButton;//rotate
+  private JButton shakeButton;//abandon current game
+  private JButton endButton;//switch to the postgame state
+  private JButton exitGameButton;//return to the main menu
 
 
   public GameMenuView() {
@@ -73,11 +74,23 @@ public class GameMenuView extends JPanel {
     gbc.fill = GridBagConstraints.HORIZONTAL;
     gbc.anchor = GridBagConstraints.FIRST_LINE_START;
     this.add(shakeButton,gbc);
-    //quit 
-    exitGameButton = new JButton("Exit Game");
+
+    //go to POSTGAME
+    endButton = new JButton("End");
     gbc = new GridBagConstraints();
-    gbc.gridx = 3;
-    gbc.gridy = 0;
+    gbc.gridx = 0;
+    gbc.gridy = 1;
+    gbc.weightx =1;
+    gbc.weighty =1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+    this.add(endButton,gbc);
+
+    //exit to main menu
+    exitGameButton = new JButton("Exit");
+    gbc = new GridBagConstraints();
+    gbc.gridx = 2;
+    gbc.gridy = 1;
     gbc.weightx =1;
     gbc.weighty =1;
     gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -98,6 +111,10 @@ public class GameMenuView extends JPanel {
 
   public void addShakeListener(ActionListener shakeListener) {
     shakeButton.addActionListener(shakeListener);
+  }
+
+  public void addEndListener(ActionListener endListener) {
+    endButton.addActionListener(endListener);
   }
     
   public void addExitGameListener(ActionListener quitListener) {

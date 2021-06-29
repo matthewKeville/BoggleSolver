@@ -55,6 +55,12 @@ public class BoggleController implements PropertyChangeListener {
         spc.setGameMode((String) evt.getNewValue());
     }
 
+
+    // change timed status
+    if (evt.getPropertyName().equals("timed")) {
+        spc.setTimed((boolean) evt.getNewValue());
+    }
+
     // mainmenu is no longer the active panel
     if (evt.getPropertyName().equals("mainMenuActive")) {
         //switch card

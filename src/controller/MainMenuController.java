@@ -76,6 +76,24 @@ public class MainMenuController {
         }
     });
 
+    //what to do when timed checkbox changes
+    mmv.addTimedBoxListener(new ActionListener() 
+    {
+        public void actionPerformed(ActionEvent e) 
+        {
+            boolean newTimed = mmv.getTimedBox().isSelected();
+            if (newTimed) {
+                //tell SinglePlayerController
+                System.out.println(" timed is true ");
+            } else {
+                //tell SinglePlayerController
+                System.out.println(" timed is false ");
+            }
+            mmm.setTimed(newTimed);
+            mmm.getSupport().firePropertyChange("timed",!newTimed,newTimed);
+        }
+    });
+
 
   }
 

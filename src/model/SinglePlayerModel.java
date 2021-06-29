@@ -230,8 +230,20 @@ public class SinglePlayerModel{
 
   public void play() {
     shake();
-    startTimer();
+    if (timed) {
+        startTimer();
+    }
     gameState = GameState.GAME;
+    fireModelChangeEvent();
+  }
+
+  public void end() {
+    if (timed) {
+        timer.stop();
+        time = 0;
+    }
+    gameState = GameState.POSTGAME;
+    answerInputResponse = "";
     fireModelChangeEvent();
   }
 
@@ -330,9 +342,9 @@ public class SinglePlayerModel{
     this.boardSolver = solverFactory.getInstance(gameMode);
   }
 
-  //change the models response string
-  public void setAnswerInputResponse(String res) {
-    this.answerInputResponse = res;
+  public void setTimed(boolean x) {
+    this.timed = x;
+    fireModelChangeEvent();
   }
 
 

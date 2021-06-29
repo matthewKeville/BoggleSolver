@@ -1,4 +1,5 @@
 package view;
+
 import java.awt.event.*;
 import java.awt.Font;
 import javax.swing.*;
@@ -22,6 +23,7 @@ public class MainMenuView extends JPanel{
  
   private JComboBox gameModeBox; 
   private JComboBox sizeBox;
+  private JCheckBox timedBox;
   private JButton playButton;
   
   public MainMenuView() {
@@ -35,6 +37,10 @@ public class MainMenuView extends JPanel{
     
   public JComboBox getSizeBox() {
     return sizeBox;
+  }
+
+  public JCheckBox getTimedBox() {
+    return timedBox;
   }
     
   public JButton getPlayButton() {
@@ -94,11 +100,23 @@ public class MainMenuView extends JPanel{
     gbc.fill = GridBagConstraints.HORIZONTAL;
     add(sizeBox,gbc);
 
+    //timed checkbox
+    timedBox = new JCheckBox(" Timed ? ");
+    timedBox.setSelected(true);
+    gbc = new GridBagConstraints();
+    gbc.gridx=0;
+    gbc.gridy=2;
+    gbc.weightx = 1;
+    gbc.weighty = 1;
+    gbc.anchor = GridBagConstraints.PAGE_START;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    add(timedBox,gbc);
+
     //Play Button
     playButton = new JButton("Play");
     gbc = new GridBagConstraints();
     gbc.gridx=0;
-    gbc.gridy=2;
+    gbc.gridy=3;
     gbc.weightx = 1;
     gbc.weighty = 1;
     gbc.anchor = GridBagConstraints.PAGE_START;
@@ -113,6 +131,10 @@ public class MainMenuView extends JPanel{
 
     public void addGameModeBoxListener(ActionListener gameModeListener) {
         gameModeBox.addActionListener(gameModeListener);
+    }
+
+    public void addTimedBoxListener(ActionListener timedListener) {
+        timedBox.addActionListener(timedListener);
     }
 
     public void addPlayButtonListener(ActionListener playListener) 
