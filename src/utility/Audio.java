@@ -50,7 +50,6 @@ public class Audio implements Playable {
                     public void update(LineEvent event) {
                         if (event.getType() == LineEvent.Type.STOP) {
                             playing = false;
-                            System.out.println("Clip : " + name + " finished playing  ");
                             clip.flush();
                         }
                     }

@@ -18,12 +18,15 @@ src/client/gui/GameMenuView.java
 src/client/gui/AnswerInputView.java
 src/client/gui/SinglePlayerView.java
 src/client/gui/SinglePlayerController.java
+src/client/gui/SinglePlayerViewModel.java
 src/client/gui/SinglePlayerModel.java
 src/client/gui/MainMenuView.java
 src/client/gui/MainMenuModel.java
 src/client/gui/MainMenuController.java
 src/client/gui/BoggleController.java
 src/client/gui/BoggleModel.java
+src/client/gui/ModelChangeEvent.java
+src/client/gui/ModelChangeListener.java
 src/controller/GameWarden.java
 src/utility/AudioPlayer.java
 src/utility/AudioEvent.java
@@ -38,3 +41,4 @@ src/utility/VolumeClipEvent.java
 src/utility/Playable.java
 src/utility/Audio.java
 src/test/AudioTest.java
+src/client/gui/TimerView.java

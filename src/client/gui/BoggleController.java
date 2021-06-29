@@ -43,7 +43,8 @@ public class BoggleController implements PropertyChangeListener {
   public void propertyChange(PropertyChangeEvent evt) {
     //change the set size in the SinglePlayerGameControllea
     System.out.println("BC revieved event");
-    System.out.println(evt.toString());
+    //System.out.println(evt.toString());
+
     if (evt.getPropertyName().equals("size")) {
         spc.setBoardSize((Integer)evt.getNewValue()); 
     }
@@ -55,9 +56,6 @@ public class BoggleController implements PropertyChangeListener {
 
     // mainmenu is no longer the active panel
     if (evt.getPropertyName().equals("mainMenuActive")) {
-        //generate a new game
-        spc.generateNewGame();
-        spc.updateAll();
         //switch card
         ((CardLayout) bv.getContentPane().getLayout()).show(bv.getContentPane(),BoggleView.SINGLEPLAYERPANEL); 
 
@@ -67,7 +65,6 @@ public class BoggleController implements PropertyChangeListener {
     if (evt.getPropertyName().equals("singlePlayerActive")) {
         //switch card
         ((CardLayout) bv.getContentPane().getLayout()).show(bv.getContentPane(),BoggleView.MAINMENUPANEL); 
-        
     }
 
         

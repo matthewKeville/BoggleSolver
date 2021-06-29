@@ -20,54 +20,43 @@ import java.awt.GridBagConstraints;
 
 import board.*;
 import solver.*;
-import utility.AudioPlayer;
+import utility.*;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeEvent;
 
 //Listens for changes to the model 
 //and applys them to the views
 
-public class SinglePlayerController {
+//SPC listens to changes in the model
+public class SinglePlayerController implements ModelChangeListener {  //implements PropertyChangeListener{
 
   private SinglePlayerView spv;
   private SinglePlayerModel spm;
+  
+  private SinglePlayerViewModel spvm;
 
   //sound stuff
-  private AudioPlayer audioPlayer;  
+  private List<AudioEventListener> audioListeners;
 
   public SinglePlayerController(SinglePlayerView spv,SinglePlayerModel spm) {
     super();
 
+
     this.spv = spv;
     this.spm = spm;
+    //listen to changes on the spm
+    //spm.addPropertyChangeListener(this);
+    spm.addModelChangeListener(this);
+    //creat the virst view model based of the view
+    this.spvm = getViewModel();
+    this.audioListeners = new ArrayList();
 
-    //create Audio Player
-    /*
-    Map<String,String> audioFileMap = new HashMap();
-    String prefix = "src/res/sound/";
-    audioFileMap.put("nice",prefix+"validwordlow.wav");
-    audioFileMap.put("great",prefix+"validwordmedium.wav");
-    audioFileMap.put("impressive",prefix+"validwordhigh.wav");
-    audioFileMap.put("excellent",prefix+"validwordtall.wav");
-    audioFileMap.put("incredible",prefix+"validwordtop.wav");
-    audioFileMap.put("bad",prefix+"badword.wav");
-    audioFileMap.put("shake",prefix+"shake.wav");
-    audioFileMap.put("rotate",prefix+"rotate.wav");
-    audioFileMap.put("background",prefix+"gameMusic.wav");
-    audioPlayer = new AudioPlayer(audioFileMap);
-    */
-    //audioPlayer.play("background");
-    //this audio - background is very loud.
-    //I need to rethink the audioPlayer, and its usage.
-    //I would like to be able to disable , sound sets, or music
-    //or in the main menu have sliders to adjust volume
 
-    //set default model fields 
-   
-    //set default view in accordance with model
-    spv.getAnswerView().createEmptyAnswerMap(spm.getMinAnswerSize(),spm.getMaxAnswerSize()); 
 
-    //update all views to reflect there model
-    //updateBoardView(); 
+    updateViews();
 
+    //Add audio sources
 
     // When the view says a new word is trying to be added,
     // check the validity of this word. 
@@ -85,76 +74,34 @@ public class SinglePlayerController {
         //  or dictate how differnt word lengths should be processed
         public void actionPerformed(ActionEvent e)
         {
-            
-            boolean valid = true;
-            System.out.println("Add New Word Attempt");
-            //trim leading and trailing ws
             String newWord = spv.getAnswerInputView().getAnswerField().getText(); 
-            newWord = newWord.trim();
-            System.out.println(newWord == null);
-            //check if there are spaces in between
-            if (newWord.contains(" ")) {
-               spv.getAnswerInputView().getResponseLabel().setText("Your word can't contain spaces"); 
-               valid = false; 
-            }
-            //check if word is already found
-            if (spm.answerExists(newWord)) {
-               spv.getAnswerInputView().getResponseLabel().setText("You already found this word!");
-               valid = false;
-            } 
-            //if word is in the answerList
-            if (!spm.getSolutionList().contains(newWord)) {
-                valid = false;
-                spv.getAnswerInputView().getResponseLabel().setText(" Umm no , look again ");            
-            } 
-            //only add if valid
-            if (valid) {
-                //spm.addAnser might be out of place, control logic should be in the controller
-                spm.addAnswer(newWord);
-                String response;
-                switch (newWord.length()) {
-                    //less than 3 shouldn't pass validity check
-                    //and isn't supported by the AnswerView
-                    //might need to change this depending on the 
-                    //game mode
-                    case 3:
-                        response = "Nice";
-                        //audioPlayer.play("nice");
-                        break;
-                    case 4:
-                        response = "Nice";
-                        //audioPlayer.play("nice");
-                        break;
-                    case 5:
-                        response = "Great";
-                        //audioPlayer.play("great");
-                        break;
-                    case 6:
-                        response = "Impressive!";
-                        //audioPlayer.play("impressive");
-                        break;
-                    case 7:
-                        response = "Excellent!";
-                        //audioPlayer.play("excellent");
-                        break;
-                    //7 +
-                    default: 
-                        response = "Incredible !!!";
-                        //audioPlayer.play("incredible");
-                        break;
-                }
-                
-                
-                spv.getAnswerInputView().getResponseLabel().setText(response);
-                updateAnswerView();
-                 
-            } else {
-                //audioPlayer.play("bad");
-            }
-            
-            //always reset the field
+            //empty the answer field
             spv.getAnswerInputView().getAnswerField().setText("");
-            //update AnswerView Model
+            if (newWord != null) {
+                SinglePlayerModel.AnswerGrade answerGrade = spm.addAnswerAttempt(newWord);
+                switch (answerGrade) {
+                    case FAIL:
+                        fireAudioEvent(new PlayClipEvent("invalid"));
+                        break;
+                    case BOTTOM: 
+                        fireAudioEvent(new PlayClipEvent("valid_bottom"));
+                        break;
+                    case LOW:
+                        fireAudioEvent(new PlayClipEvent("valid_low"));
+                        break;
+                    case MEDIUM:
+                        fireAudioEvent(new PlayClipEvent("valid_medium"));
+                        break;
+                    case HIGH:
+                        fireAudioEvent(new PlayClipEvent("valid_high"));
+                        break;
+                    case TOP:
+                        fireAudioEvent(new PlayClipEvent("valid_top"));
+                        break;
+                    default:
+                        System.out.println("Invalid AnswerGrade passed to the SPC");
+                }
+            } else { System.out.println(" but answer was null ");}
         }
     });
 
@@ -163,15 +110,8 @@ public class SinglePlayerController {
         public void actionPerformed(ActionEvent e)
         {
             System.out.println("Shake Button Pressed");
-            //update the board model // setBoard solves and populates solutionList
-            generateNewGame();
-            //update the board view
-            updateBoardView();
-            //tbd update answerModel
-            spm.resetUserAnswersMap();
-            //tbd update answerView
-            updateAnswerView();
-            //audioPlayer.play("shake");
+            spm.shake();
+            fireAudioEvent(new PlayClipEvent("shake"));
         }
     }); 
 
@@ -180,9 +120,8 @@ public class SinglePlayerController {
         public void actionPerformed(ActionEvent e)
         {
             System.out.println("Rotate Left Button Pressed");
-            spm.getBoard().rotateLeft();
-            updateBoardView();
-            //audioPlayer.play("rotate");
+            spm.rotateLeft();
+            fireAudioEvent(new PlayClipEvent("rotate"));
         }
     }); 
 
@@ -191,9 +130,8 @@ public class SinglePlayerController {
         public void actionPerformed(ActionEvent e)
         {
             System.out.println("Rotate Right Button Pressed");
-            spm.getBoard().rotateRight();
-            updateBoardView();
-            //audioPlayer.play("rotate");
+            spm.rotateRight();
+            fireAudioEvent(new PlayClipEvent("rotate"));
         }
     });
 
@@ -206,33 +144,100 @@ public class SinglePlayerController {
         }
     });
 
+    spv.getBoardView().addPlayListener(new ActionListener() 
+    {
+        public void actionPerformed(ActionEvent e)
+        {
+            System.out.println("Play Button Pressed, starting game");
+            spm.play();
+        }
+    });
+
   }
 
 
-  /////////////////////
-  //View update
-  //////////////////////
+  //////////////////////////////////////
+  // View Update Part Deux (ViewModel)
+  /////////////////////////////////////
 
-  private void updateBoardView() {
-    spv.getBoardView().setBoard(spm.getBoard());
+  //update views, will getViewModel() , check if new ViewModel
+  //differs from previous, if it does, it will check how it differs 
+  //and update the corresponding views
+
+
+  //the intent here is to compare the previoius viewModel to the current 
+  //and sort out the diffs, but this approach doesn't work because of how coying 
+  //works in java. I need to look into implementing a cloning method
+  //or implementing hashes and compare old new hash values
+  
+  //for now, whenever the model changes I will update all views
+  public void updateViews() {
+    SinglePlayerViewModel oldModel = spvm;
+    spvm = getViewModel();
+           spv.getBoardView().refresh(spvm);
+           spv.getAnswerView().refresh(spvm);            
+           spv.getAnswerInputView().refresh(spvm);
+           spv.getTimerView().refresh(spvm);
+           System.out.println("Game State: " + spvm.getGameState());
   }
 
-  private void updateAnswerView() {
-    spv.getAnswerView().updateListModels(spm.getUserAnswersMap()); 
+  //Construct a view Model from the model
+  public SinglePlayerViewModel getViewModel() {
+    System.out.println(spm.getBoard() == null);
+    return new SinglePlayerViewModel(spm.getBoard().getFaces(),spm.getUserAnswersMap(),spm.getAnswerInputResponse(),spm.isTimed(),spm.getTime(),spm.getGameState(),spm.getSolutionMap());
   }
 
-  public void updateAll() {
-    updateBoardView();
-    updateAnswerView();
+  public void modelChange(ModelChangeEvent mce) {
+    System.out.println(mce.getModelName() + " has changed ");
+    updateViews(); 
+  } 
+
+  //// Audio Player hooks ////
+  
+  public void addAudioListener(AudioEventListener ael) {
+    audioListeners.add(ael);
+  }
+
+  //*probably bad design, maybe I don't need event handlers at all
+  //* rethink this approach
+  //broadcast all addAudio Events to any AudioEventListeners
+  public void addAllAudio() {
+
+    String gameSfx = "gameSoundEffects";
+    float sfxVolume = .6f;
+    float musicVolume = .5f;
+    String gameMusic = "gameMusic";
+
+
+    fireAudioEvent(new AddAudioSourceEvent("invalid",gameSfx,"src/res/sound/badword.wav",sfxVolume));
+    fireAudioEvent(new AddAudioSourceEvent("valid_bottom",gameSfx,"src/res/sound/validwordlow.wav",sfxVolume));
+    fireAudioEvent(new AddAudioSourceEvent("valid_low",gameSfx,"src/res/sound/validwordmedium.wav",sfxVolume));
+    fireAudioEvent(new AddAudioSourceEvent("valid_medium",gameSfx,"src/res/sound/validwordhigh.wav",sfxVolume));
+    fireAudioEvent(new AddAudioSourceEvent("valid_high",gameSfx,"src/res/sound/validwordtall.wav",sfxVolume));
+    fireAudioEvent(new AddAudioSourceEvent("valid_top",gameSfx,"src/res/sound/validwordtop.wav",sfxVolume));
+    fireAudioEvent(new AddAudioSourceEvent("shake",gameSfx,"src/res/sound/shake.wav",sfxVolume));
+    fireAudioEvent(new AddAudioSourceEvent("rotate",gameSfx,"src/res/sound/rotate.wav",sfxVolume));
+
+    //invalid is too quiet
+    fireAudioEvent(new VolumeClipEvent("invalid",.7f)); 
+
+  }
+
+  public void fireAudioEvent(AudioEvent ae) {
+    for (AudioEventListener ael : audioListeners) {
+        ael.fireAudioEvent(ae);
+    }
   }
 
 
   /////////////////////////////////////
   // Called from parent controller
   //////////////////////////////////////
+  /*
   public void generateNewGame() {
     spm.generateNewGame();
   }
+  */
 
   public void setBoardSize(int newSize) {
     spm.setSize(newSize);

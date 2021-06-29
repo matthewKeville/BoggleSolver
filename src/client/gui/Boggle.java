@@ -1,4 +1,5 @@
 package client.gui;
+import utility.AudioPlayer;
 //Create all the MVC's
 public class Boggle {
 
@@ -14,10 +15,19 @@ public class Boggle {
     private MainMenuView mmv;
     private MainMenuController mmc;
 
+    private AudioPlayer audioPlayer;
+
     public Boggle() {
+        //create Audio Player
+        audioPlayer = new AudioPlayer(); 
+
         spm = new SinglePlayerModel();
         spv = new SinglePlayerView();  
         spc = new SinglePlayerController(spv,spm);
+        
+        spc.addAudioListener(audioPlayer);
+        spc.addAllAudio();
+
         //shoud have Main Menu Model
         mmv = new MainMenuView();
         mmm = new MainMenuModel();

@@ -32,6 +32,7 @@ public class SinglePlayerView extends JPanel{
   private AnswerView av;
   private AnswerInputView aiv;  
   private GameMenuView gmv;
+  private TimerView tv;
 
   public SinglePlayerView() {
     super();
@@ -39,6 +40,7 @@ public class SinglePlayerView extends JPanel{
     av = new AnswerView();
     aiv = new AnswerInputView();
     gmv = new GameMenuView();
+    tv = new TimerView();
     createAndShow(); 
   }
 
@@ -58,6 +60,10 @@ public class SinglePlayerView extends JPanel{
     return gmv;
   }
 
+  public TimerView getTimerView() {
+    return tv;
+  }
+
   private void createAndShow() {
     //create board view in future, board should be supplied to constructor
     //for purposes now, it is in BoardView
@@ -66,28 +72,35 @@ public class SinglePlayerView extends JPanel{
     setLayout(new GridBagLayout());
     setBackground(gold);
     setOpaque(true);
+    //Timer View 
+    GridBagConstraints c0 = new GridBagConstraints();
+    c0.gridx = 0;
+    c0.gridy = 0;
+    c0.anchor = GridBagConstraints.CENTER;
+    add(tv,c0);
+
     //Board View
     GridBagConstraints c1 = new GridBagConstraints();
     c1.gridx = 0;
-    c1.gridy = 0;
+    c1.gridy = 1;
     c1.anchor = GridBagConstraints.FIRST_LINE_END;
     add(bv,c1);
     //Answer View
     GridBagConstraints c2 = new GridBagConstraints();
     c2.gridx = 1;
-    c2.gridy = 0;
+    c2.gridy = 1;
     c2.anchor = GridBagConstraints.FIRST_LINE_START;
     add(av,c2);
     //Answer Input Field
     GridBagConstraints c3 = new GridBagConstraints();
     c3.gridx = 0;
-    c3.gridy = 1;
+    c3.gridy = 2;
     c3.anchor = GridBagConstraints.FIRST_LINE_START;
     add(aiv,c3);
     //add GameMenu
     GridBagConstraints c4 = new GridBagConstraints();
     c4.gridx = 1;
-    c4.gridy = 1;
+    c4.gridy = 2;
     c4.anchor = GridBagConstraints.FIRST_LINE_START;
     add(gmv,c4);
 

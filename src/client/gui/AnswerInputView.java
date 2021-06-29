@@ -42,6 +42,7 @@ public class AnswerInputView extends JPanel {
     //make JTextField encompass more than 200 chars
     //but cosmetically make it look like only a set amount
     answerField = new JTextField(20);
+    answerField.setVisible(false);
     //docs reccomend using gridlayout or borderlayout for single item containers
     setLayout(new GridBagLayout());
     GridBagConstraints gbc = new GridBagConstraints();
@@ -64,17 +65,39 @@ public class AnswerInputView extends JPanel {
 
   }
 
+  public void refresh(SinglePlayerViewModel spvm) {
+    String response = spvm.getResponseLabel();
+    System.out.println("updating answer input view");
+    responseLabel.setText(response);
+    if (spvm.getGameState() == SinglePlayerModel.GameState.GAME) {
+        System.out.println("in game state; is answerField displayable" + answerField.isDisplayable());
+        //if (!answerField.isDisplayable()) {
+            answerField.setVisible(true);
+            System.out.println("making answer input visible");
+            revalidate();
+        //}
+    } else if (spvm.getGameState() == SinglePlayerModel.GameState.POSTGAME) {
+        //hide answerInput
+        answerField.setText("");
+        answerField.setVisible(false);
+        revalidate();
+        //Set Response Label to Time's Up
+        responseLabel.setText("Time's Up");
+    }
+    
+    
+  }
+
+  //Events
+
   public void addNewWordListener(ActionListener listenForInput) {
     answerField.addActionListener(listenForInput);
   }
 
+  //Access
+
   public JTextField getAnswerField() {
     return answerField;
   }
-
-  public JLabel getResponseLabel() {
-    return responseLabel;
-  }
-
 
 }
