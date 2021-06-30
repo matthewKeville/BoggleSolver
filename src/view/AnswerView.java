@@ -23,6 +23,9 @@ import java.util.stream.*;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import model.SinglePlayerModel;
 
 public class AnswerView extends JPanel {
@@ -31,16 +34,51 @@ public class AnswerView extends JPanel {
   
   //words greater than or equal to will be put
   //in the same column of maxSize
-
+  private JPanel scrollPanePanel;
+  private JScrollPane scrollPane;
   private Map<Integer,JList> listModelMap;
+
+  //JLists come and go, so I will capture
+  //the actionEvent set by controller and apply
+  //it to any new list
+  private ListSelectionListener wordSelected;
 
   public AnswerView() {
     super();
     this.setPreferredSize(new Dimension(400,400));
-    this.setBackground(orangeRed);
-    this.setOpaque(true);
+    //this.setBackground(orangeRed);
+    //this.setOpaque(true);
     this.setLayout(new GridBagLayout());
+    
+
+    scrollPanePanel = new JPanel();
+    scrollPanePanel.setPreferredSize(new Dimension(400,800));
+    scrollPanePanel.setBackground(orangeRed);
+    scrollPanePanel.setOpaque(true);
+    scrollPanePanel.setLayout(new GridBagLayout());
+    
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.gridx=0;
+    gbc.gridy=0;
+    gbc.weightx=1;
+    gbc.weighty=1;
+    gbc.anchor = GridBagConstraints.CENTER;
+    gbc.fill = GridBagConstraints.BOTH;  
+    scrollPane = new JScrollPane(scrollPanePanel);
+    this.add(scrollPane,gbc);
+
   }
+
+  //under the current design all JLists are obliterated when
+  //a new game starts, when the controller calls addAndSet,
+  //it applies to actionListener to all active JLists
+  //and caches the event to wordSelected which is applied
+  //to all new instances if wordSelected != null
+  public void addAndSetSelectedListener(ListSelectionListener lsl) {
+    //store handler
+    wordSelected = lsl;
+  }
+
 
   public void refresh(SinglePlayerViewModel spvm) {
     if (spvm.getGameState() == SinglePlayerModel.GameState.GAME ) {
@@ -59,13 +97,14 @@ public class AnswerView extends JPanel {
             }
         }
 
-        removeAll();    
-        revalidate();
+        scrollPanePanel.removeAll();    
+        scrollPanePanel.revalidate();
 
         createEmptyUserAnswerMap(minSize,maxSize);
         updateUserListModels(userAnswersMap);
 
-        repaint();
+        scrollPanePanel.repaint();
+
     //Game Over - add all answers under user answers
     //consider bundling this into a seperate method call to improve readibility
     } else if (spvm.getGameState() == SinglePlayerModel.GameState.POSTGAME) {
@@ -95,14 +134,15 @@ public class AnswerView extends JPanel {
         System.out.println("user answers complement");
         System.out.println(usersComplementMap.toString()); 
         createUserAnswersComplementLists(usersComplementMap);
-        revalidate();
-        repaint();
+
+        scrollPanePanel.revalidate();
+        scrollPanePanel.repaint();
     //If in pregame state there should be no answer display
     } else if (spvm.getGameState() == SinglePlayerModel.GameState.PREGAME) {
         //clear all
-        removeAll();
-        revalidate();
-        repaint();
+        scrollPanePanel.removeAll();
+        scrollPanePanel.revalidate();
+        scrollPanePanel.repaint();
     }
     
       
@@ -134,6 +174,10 @@ public class AnswerView extends JPanel {
     {
         List<String> answerSizeList = new ArrayList(); 
         JList sizeList = new JList(new DefaultListModel());
+        //if the controller has determined what to do on index select add stored handler
+        if (wordSelected != null) {
+            sizeList.addListSelectionListener(wordSelected);
+        }
         sizeList.setForeground(Color.BLACK);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = k - minAnswerSize;
@@ -142,7 +186,7 @@ public class AnswerView extends JPanel {
         gbc.weighty = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.FIRST_LINE_START;
-        this.add(sizeList,gbc);
+        scrollPanePanel.add(sizeList,gbc);
         listModelMap.put(k,sizeList);
     }
   }
@@ -171,6 +215,9 @@ public class AnswerView extends JPanel {
             solutionListModel.addElement(str); 
         }
         JList sizeList = new JList(solutionListModel);
+        if (wordSelected != null) {
+            sizeList.addListSelectionListener(wordSelected);
+        }
         sizeList.setForeground(Color.RED);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = k - minSize;
@@ -179,7 +226,7 @@ public class AnswerView extends JPanel {
         gbc.weighty = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.FIRST_LINE_START;
-        this.add(sizeList,gbc);
+        scrollPanePanel.add(sizeList,gbc);
     }
   }
 

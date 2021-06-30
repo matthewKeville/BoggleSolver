@@ -18,8 +18,16 @@ public class SinglePlayerViewModel {
     private List<String> faces;
 
     //AnswersView
+    
+    // user answers indexed by size
     //min and max size can be inferred from keySet
     private Map<Integer,List<String>> userAnswersMap;
+
+    // solution indexed by size
+    private Map<Integer,List<String>> solutionMap;
+
+    //paths of each word in solution set
+    private Map<String,List<List<Integer>>> solution;
 
     //AnswerInputView
     private String responseLabel;
@@ -33,16 +41,16 @@ public class SinglePlayerViewModel {
     //gameState
     private SinglePlayerModel.GameState gameState;
 
-    private Map<Integer,List<String>> solutionMap;
 
-    public SinglePlayerViewModel(List<String> faces, Map<Integer,List<String>> userAnswersMap, String responseLabel,boolean timed, int time,SinglePlayerModel.GameState gameState,Map<Integer,List<String>> solutionMap) {
+    public SinglePlayerViewModel(List<String> faces, Map<Integer,List<String>> userAnswersMap, String responseLabel,boolean timed, int time,SinglePlayerModel.GameState gameState,Map<Integer,List<String>> solutionMap,Map<String,List<List<Integer>>> solution) {
         this.faces = faces;
         this.userAnswersMap = userAnswersMap;
+        this.solutionMap = solutionMap;
+        this.solution = solution;
         this.responseLabel = responseLabel;     
         this.timed = timed;
         this.time = time;
         this.gameState = gameState;
-        this.solutionMap = solutionMap;
     }
 
 
@@ -52,6 +60,15 @@ public class SinglePlayerViewModel {
 
     public Map<Integer,List<String>> getUserAnswersMap() {
         return userAnswersMap;
+    }
+
+
+    public Map<Integer,List<String>> getSolutionMap() {
+        return solutionMap;
+    }
+
+    public Map<String,List<List<Integer>>> getSolution() {
+        return solution;
     }
 
     public String getResponseLabel() {
@@ -70,9 +87,6 @@ public class SinglePlayerViewModel {
         return gameState;
     }
 
-    public Map<Integer,List<String>> getSolutionMap() {
-        return solutionMap;
-    }
 
 
 

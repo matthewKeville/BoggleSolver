@@ -21,6 +21,9 @@ import java.awt.GridBagConstraints;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
 
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import model.audio.*;
 import model.ModelChangeListener;
 import model.ModelChangeEvent;
@@ -165,6 +168,16 @@ public class SinglePlayerController implements ModelChangeListener {  //implemen
             spm.end();
         }
     });
+
+    //these are firing twice ... wth
+    spv.getAnswerView().addAndSetSelectedListener(new ListSelectionListener() 
+    {
+        public void valueChanged(ListSelectionEvent e) {
+            System.out.println("the selected index is " + e.getFirstIndex());
+            spv.getAnswerView().deselectAllJLists();
+        }
+
+    });
             
 
   }
@@ -198,7 +211,7 @@ public class SinglePlayerController implements ModelChangeListener {  //implemen
   //Construct a view Model from the model
   public SinglePlayerViewModel getViewModel() {
     System.out.println(spm.getBoard() == null);
-    return new SinglePlayerViewModel(spm.getBoard().getFaces(),spm.getUserAnswersMap(),spm.getAnswerInputResponse(),spm.isTimed(),spm.getTime(),spm.getGameState(),spm.getSolutionMap());
+    return new SinglePlayerViewModel(spm.getBoard().getFaces(),spm.getUserAnswersMap(),spm.getAnswerInputResponse(),spm.isTimed(),spm.getTime(),spm.getGameState(),spm.getSolutionMap(),spm.getSolution());
   }
 
   public void modelChange(ModelChangeEvent mce) {

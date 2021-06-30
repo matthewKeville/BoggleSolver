@@ -13,6 +13,7 @@ import javax.swing.Timer;
 import java.beans.PropertyChangeSupport;
 import java.beans.PropertyChangeListener;
 
+//remove wildcards ...
 import model.board.*;
 import model.solver.*;
 import model.*;
@@ -72,8 +73,6 @@ public class SinglePlayerModel{
 
   private SolverFactory solverFactory;
   private Solver boardSolver;
-  //stores user answers by size
-  private Map<Integer,List<String>> userAnswersMap;
   //the minimum accepted answer size and the 
   //maximum word length bin. All words > maxAnswerSize
   //are stored in the same index in the userAnswermap
@@ -92,10 +91,20 @@ public class SinglePlayerModel{
   private final Timer timer = new Timer(1000,new ActionListener(){ public void actionPerformed(ActionEvent e){}});
  
   private GameState gameState; 
-  //List of all valid words 
-  private List<String> solutionList; 
-  //Map of valid words indexed by size
+
+  //Map of users valid words indexed by size
+  //Change userAnswersMap > answersBySize
+  //stores user answers by size
+  private Map<Integer,List<String>> userAnswersMap;
+
+  //Map of valid words indexed by size (can be derived from solution)
+  // name change solutionMap > solutionBySize
   private Map<Integer,List<String>> solutionMap;
+   
+  // all words and the paths to get to them
+  private Map<String,List<List<Integer>>> solution;
+
+
 
   //this might not be necessary, but its currently
   //used to facilitate changing between main menu and single
@@ -114,19 +123,21 @@ public class SinglePlayerModel{
     setupTimer();
 
     this.size = 4;
+    this.minAnswerSize = 3;
+    this.maxAnswerSize = 7;
     this.gameMode = "Classic";
     this.boardFactory = new BoardFactory();
     this.board = boardFactory.getInstance(size,gameMode);
     this.solverFactory = new SolverFactory("src/res/corncob_lowercase.txt");
     this.boardSolver = solverFactory.getInstance(gameMode);
-    this.minAnswerSize = 3;
-    this.maxAnswerSize = 7;
 
-    //create the map to accomodate the permitted answer constraints
+
+
+    this.solution = new HashMap();
+    this.solutionMap = new HashMap();
+
     this.userAnswersMap = new HashMap();
     this.answerInputResponse = "";   
-    this.solutionList = new ArrayList();
-    this.solutionMap = new HashMap();
 
     this.gameState = GameState.PREGAME;
     this.timed = true;
@@ -142,7 +153,7 @@ public class SinglePlayerModel{
    //Internal Control
    ////////////////
 
-
+   // * Depends on solutionList */
    //Transform the solution list into a map, that follows
    //the same indexing scheme for the userAnswersMap
    private void  generateSolutionMap() {
@@ -153,7 +164,7 @@ public class SinglePlayerModel{
         }
 
         //populate map
-        for (String sol : solutionList) {
+        for (String sol : solution.keySet()) {
             if (sol.length() < maxAnswerSize) {
                 List<String> words = solutionMap.get(sol.length());
                 words.add(sol); 
@@ -210,21 +221,23 @@ public class SinglePlayerModel{
   //External Control
   ////////////////////
 
-
   //shake (new Game) 
-  //clear user answers, clear solutions, reset timer
-  //create a new board 
   public void shake() {
     System.out.println("board was shook");
+    //new board
     this.board = boardFactory.getInstance(size,gameMode);
-    this.solutionList = boardSolver.solveWords(board);
+    //new solve
+    this.solution = boardSolver.solve(board);
+    generateSolutionMap();
+    //clear user vars
     answerInputResponse = "";
     resetUserAnswersMap();
-    generateSolutionMap();
+    //reset timer
     timer.stop();
     time = gameDuration;
     //change game state to preGame
     gameState = GameState.PREGAME;
+    //notify controller
     fireModelChangeEvent();
   }
 
@@ -237,6 +250,7 @@ public class SinglePlayerModel{
     fireModelChangeEvent();
   }
 
+
   public void end() {
     if (timed) {
         timer.stop();
@@ -246,7 +260,6 @@ public class SinglePlayerModel{
     answerInputResponse = "";
     fireModelChangeEvent();
   }
-
 
   // Check if the given answer exists in the current board
   // If it does add it to the model 
@@ -276,7 +289,7 @@ public class SinglePlayerModel{
             }
 
             //if word is in the answerList
-            if (!solutionList.contains(newWord)) {
+            if (!solution.keySet().contains(newWord)) {
                 valid = false;
                 answerInputResponse = " Umm no , this is awkward ";
             }
@@ -304,9 +317,7 @@ public class SinglePlayerModel{
             return answerGrade;
   }
 
-  //changeGameMode
 
-  //changeGameSize
 
 
   //rotateLeft
@@ -329,8 +340,6 @@ public class SinglePlayerModel{
         this.active = x;
   }
 
-  
-
   //Change the size
   public void setSize(int newSize) {
     this.size = newSize;
@@ -342,19 +351,20 @@ public class SinglePlayerModel{
     this.boardSolver = solverFactory.getInstance(gameMode);
   }
 
+  // determine if the game has a time limit
   public void setTimed(boolean x) {
     this.timed = x;
     fireModelChangeEvent();
   }
 
-
-  //Check if the word is already in the userAnswerMap
+  //Check if a word is already in the userAnswerMap
   private boolean answerExists(String ans) {
     if (ans.length() < minAnswerSize) { return false; }
     List<String> answersOfSameSize = (ans.length()<maxAnswerSize)?userAnswersMap.get(ans.length()):userAnswersMap.get(maxAnswerSize);
     return answersOfSameSize.contains(ans);
   }
  
+
  
   //facilitates adding an answer to the user answer map
   //intended to be called by  addAnswerAttempt
@@ -421,10 +431,6 @@ public class SinglePlayerModel{
   public String getAnswerInputResponse() {
     return this.answerInputResponse;
   }
-    
-  public List<String> getSolutionList() {
-    return this.solutionList;
-  }
 
   public int getMaxAnswerSize() {
     return this.maxAnswerSize;
@@ -434,7 +440,6 @@ public class SinglePlayerModel{
     return this.minAnswerSize;
   }
 
-
   public int getTime() {
     return time;
   }
@@ -442,7 +447,6 @@ public class SinglePlayerModel{
   public boolean isTimed() {
     return timed;
   }
-
 
   public boolean getActive() {
     return this.active;
@@ -454,6 +458,10 @@ public class SinglePlayerModel{
 
   public Map<Integer,List<String>> getSolutionMap() {
     return solutionMap;
+  }
+
+  public Map<String,List<List<Integer>>> getSolution() {
+    return solution;
   }
 
   //pcl interface requirements
