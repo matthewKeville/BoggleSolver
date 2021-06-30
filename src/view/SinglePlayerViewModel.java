@@ -32,6 +32,9 @@ public class SinglePlayerViewModel {
     //AnswerInputView
     private String responseLabel;
 
+    //inspect word
+    private String inspectedWord;
+
     //game time
     private int time;
 
@@ -42,12 +45,13 @@ public class SinglePlayerViewModel {
     private SinglePlayerModel.GameState gameState;
 
 
-    public SinglePlayerViewModel(List<String> faces, Map<Integer,List<String>> userAnswersMap, String responseLabel,boolean timed, int time,SinglePlayerModel.GameState gameState,Map<Integer,List<String>> solutionMap,Map<String,List<List<Integer>>> solution) {
+    public SinglePlayerViewModel(List<String> faces, Map<Integer,List<String>> userAnswersMap, String responseLabel,String inspectedWord,boolean timed, int time,SinglePlayerModel.GameState gameState,Map<Integer,List<String>> solutionMap,Map<String,List<List<Integer>>> solution) {
         this.faces = faces;
         this.userAnswersMap = userAnswersMap;
         this.solutionMap = solutionMap;
         this.solution = solution;
         this.responseLabel = responseLabel;     
+        this.inspectedWord = inspectedWord;
         this.timed = timed;
         this.time = time;
         this.gameState = gameState;
@@ -73,6 +77,10 @@ public class SinglePlayerViewModel {
 
     public String getResponseLabel() {
         return responseLabel;
+    }
+
+    public String getInspectedWord() {
+        return inspectedWord;
     }
 
     public int getTime() {

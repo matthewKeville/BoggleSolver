@@ -26,6 +26,7 @@ import java.util.Set;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+
 import model.SinglePlayerModel;
 
 public class AnswerView extends JPanel {
@@ -37,7 +38,7 @@ public class AnswerView extends JPanel {
   private JPanel scrollPanePanel;
   private JScrollPane scrollPane;
   private Map<Integer,JList> listModelMap;
-
+    
   //JLists come and go, so I will capture
   //the actionEvent set by controller and apply
   //it to any new list
@@ -67,6 +68,9 @@ public class AnswerView extends JPanel {
     scrollPane = new JScrollPane(scrollPanePanel);
     this.add(scrollPane,gbc);
 
+    //the graphPanel should be above the scroll pane, but not restrict
+    //interaction with the scroll sliders
+    
   }
 
   //under the current design all JLists are obliterated when
@@ -137,6 +141,7 @@ public class AnswerView extends JPanel {
 
         scrollPanePanel.revalidate();
         scrollPanePanel.repaint();
+
     //If in pregame state there should be no answer display
     } else if (spvm.getGameState() == SinglePlayerModel.GameState.PREGAME) {
         //clear all

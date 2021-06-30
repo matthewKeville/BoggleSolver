@@ -173,8 +173,10 @@ public class SinglePlayerController implements ModelChangeListener {  //implemen
     spv.getAnswerView().addAndSetSelectedListener(new ListSelectionListener() 
     {
         public void valueChanged(ListSelectionEvent e) {
-            System.out.println("the selected index is " + e.getFirstIndex());
-            spv.getAnswerView().deselectAllJLists();
+            JList firedFrom = (JList) e.getSource();
+            ListModel firedFromModel = firedFrom.getModel();
+            String newInspectedWord = (String) firedFromModel.getElementAt(e.getFirstIndex());
+            spm.setInspectedWord(newInspectedWord);
         }
 
     });
@@ -211,7 +213,8 @@ public class SinglePlayerController implements ModelChangeListener {  //implemen
   //Construct a view Model from the model
   public SinglePlayerViewModel getViewModel() {
     System.out.println(spm.getBoard() == null);
-    return new SinglePlayerViewModel(spm.getBoard().getFaces(),spm.getUserAnswersMap(),spm.getAnswerInputResponse(),spm.isTimed(),spm.getTime(),spm.getGameState(),spm.getSolutionMap(),spm.getSolution());
+    return new SinglePlayerViewModel(spm.getBoard().getFaces(),spm.getUserAnswersMap(),spm.getAnswerInputResponse(),spm.getInspectedWord(),
+                spm.isTimed(),spm.getTime(),spm.getGameState(),spm.getSolutionMap(),spm.getSolution());
   }
 
   public void modelChange(ModelChangeEvent mce) {

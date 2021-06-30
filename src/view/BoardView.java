@@ -9,10 +9,21 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.List;
+import java.util.LinkedList;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.CardLayout;
+import java.awt.Point;
+import java.awt.Graphics;
+//Extension of awt.graphics for more
+//sophisticated rendering (I need line thickness)
+import java.awt.Graphics2D;
+import java.awt.geom.Line2D;
+import java.awt.BasicStroke;
+import java.awt.Stroke;
+
 
 import model.board.*;
 import model.SinglePlayerModel; //I dislike this coupling
@@ -33,9 +44,48 @@ public class BoardView extends JPanel {
     
   private JButton playButton;
 
+  private WordGraph wordGraph;
+  private List<Integer> graphPath;
+
   private List<JLabel> faceLabels;
   private Color oldLace = new Color(.992f,.961f,.902f);
   private Color cream = new Color(1.0f,.992f,.816f);
+
+  public class WordGraph extends JPanel {
+    @Override
+    public void paintComponent(Graphics g) {
+        System.out.println("WordGraph Repaint Called");
+        super.paintComponent(g);
+        g.setColor(Color.RED);
+        List<Integer> path = new LinkedList();
+        graphWord(graphPath,g);
+    }
+
+    //Given a word path draw lines between the centers of the JLabels
+    //that represent the point on that path
+    private void graphWord(List<Integer> path,Graphics g) 
+    {
+        if (path.size() != 0) {
+            Graphics2D g2d = (Graphics2D) g;
+            Stroke stroke = new BasicStroke(4f);
+            g2d.setStroke(stroke);
+            Iterator pathIterator = path.iterator();
+            JLabel current = faceLabels.get((Integer) pathIterator.next()); 
+            while (pathIterator.hasNext()) {
+                JLabel next = faceLabels.get( (Integer) pathIterator.next());
+                //draw line from current to next
+                g2d.drawLine(current.getX()+(current.getWidth()/2),current.getY()+(current.getHeight()/2)
+                            ,next.getX()+(current.getWidth()/2),next.getY()+(next.getHeight()/2)); 
+                //set  current to next
+                current  = next;
+            } 
+        }
+    }
+ 
+  }
+
+  
+  
 
   public BoardView() {
     super();
@@ -65,12 +115,28 @@ public class BoardView extends JPanel {
     playButton.setForeground(Color.BLACK);
     boardPreView.add(playButton,gbc);
 
-    //create boardview *Dynamic, just create the panel
+    //create boardview just create the panel
     boardView = new JPanel();
+
+    //put the boardView in a JLayered Pane
+    //where the WordGraph exists above it
+    JLayeredPane boardViewLayers = new JLayeredPane();
+    boardViewLayers.setPreferredSize(new Dimension(400,400)); 
+    boardView.setBounds(0,0,400,400);
+    boardViewLayers.add(boardView,new Integer(2),1);
+
+    wordGraph = new WordGraph();
+    wordGraph.setPreferredSize(new Dimension(400,400));
+    wordGraph.setOpaque(false);
+    wordGraph.setBounds(0,0,400,400);
+
+    graphPath = new LinkedList();
+ 
+    boardViewLayers.add(wordGraph,new Integer(2),0); 
 
 
     add(boardPreView,BOARDPREVIEW);
-    add(boardView,BOARDVIEW); 
+    add(boardViewLayers,BOARDVIEW);
 
   }
 
@@ -120,24 +186,38 @@ public class BoardView extends JPanel {
       boardView.add(label); 
     }
 
-    boardView.repaint();
-
+    //ensures no path rendering happens outside of POSTGAME 
+    if (spvm.getGameState() != SinglePlayerModel.GameState.POSTGAME) { 
+        graphPath.clear();
+    }
 
   }
 
-   
  
   public void refresh(SinglePlayerViewModel spvm) {
     System.out.println("refreshing Board View");
-    refreshBoardView(spvm);
 
     if (spvm.getGameState() == SinglePlayerModel.GameState.GAME) {
         ((CardLayout) getLayout()).show(this,BOARDVIEW);
     } else if (spvm.getGameState() == SinglePlayerModel.GameState.PREGAME) {
         ((CardLayout) getLayout()).show(this,BOARDPREVIEW);
     }
+   
+    //graph the inspected word 
+    if (spvm.getGameState() == SinglePlayerModel.GameState.POSTGAME) {
+        System.out.println(" game state is postgame in boardview udate");
+        System.out.println(" inspected word : " + spvm.getInspectedWord() );
+        if (!spvm.getInspectedWord().equals("")) {
+            List<List<Integer>> paths = spvm.getSolution().get(spvm.getInspectedWord());
+            graphPath = paths.get(0); 
+            System.out.println("graph path");
+            System.out.println(graphPath);
+            wordGraph.repaint();
+        }
+    }
 
-    //repaint();
+    refreshBoardView(spvm);
+
     
   }
 

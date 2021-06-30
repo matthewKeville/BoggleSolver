@@ -104,6 +104,9 @@ public class SinglePlayerModel{
   // all words and the paths to get to them
   private Map<String,List<List<Integer>>> solution;
 
+  //the inspected word in the answersview
+  private String inspectedWord;
+
 
 
   //this might not be necessary, but its currently
@@ -146,6 +149,8 @@ public class SinglePlayerModel{
 
     //might group into gameState
     this.active = false;
+
+    this.inspectedWord = "";
   }
 
 
@@ -231,6 +236,7 @@ public class SinglePlayerModel{
     generateSolutionMap();
     //clear user vars
     answerInputResponse = "";
+    inspectedWord = "";
     resetUserAnswersMap();
     //reset timer
     timer.stop();
@@ -257,6 +263,7 @@ public class SinglePlayerModel{
         time = 0;
     }
     gameState = GameState.POSTGAME;
+    inspectedWord = "";
     answerInputResponse = "";
     fireModelChangeEvent();
   }
@@ -333,6 +340,11 @@ public class SinglePlayerModel{
   }
 
 
+  public void setInspectedWord(String word) {
+    System.out.println(" Model says new inspected word " + word);
+    this.inspectedWord = word;
+    fireModelChangeEvent();
+  }
   
   // Indicate that the user is no longer viewing this data
   // data model
@@ -430,6 +442,10 @@ public class SinglePlayerModel{
 
   public String getAnswerInputResponse() {
     return this.answerInputResponse;
+  }
+
+  public String getInspectedWord() {
+    return this.inspectedWord;
   }
 
   public int getMaxAnswerSize() {
