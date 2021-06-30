@@ -52,32 +52,52 @@ public class BoardView extends JPanel {
   private Color cream = new Color(1.0f,.992f,.816f);
 
   public class WordGraph extends JPanel {
+
+    private List<Color> colorGradient;
+
+    public WordGraph() {
+        super();
+        colorGradient = new ArrayList();
+        colorGradient.add(Color.red);
+        colorGradient.add(Color.pink);
+        colorGradient.add(Color.orange);
+        colorGradient.add(Color.yellow);
+        colorGradient.add(Color.green);
+        colorGradient.add(Color.cyan);
+        colorGradient.add(Color.blue);
+        colorGradient.add(Color.magenta);
+    }
     @Override
     public void paintComponent(Graphics g) {
         System.out.println("WordGraph Repaint Called");
         super.paintComponent(g);
-        g.setColor(Color.RED);
         List<Integer> path = new LinkedList();
         graphWord(graphPath,g);
     }
 
+
+    // Warning ! this does not consider board rotation 
     //Given a word path draw lines between the centers of the JLabels
     //that represent the point on that path
     private void graphWord(List<Integer> path,Graphics g) 
     {
+        int colorIndex = 0;
         if (path.size() != 0) {
             Graphics2D g2d = (Graphics2D) g;
             Stroke stroke = new BasicStroke(4f);
             g2d.setStroke(stroke);
+            g2d.setColor(Color.RED);
             Iterator pathIterator = path.iterator();
             JLabel current = faceLabels.get((Integer) pathIterator.next()); 
             while (pathIterator.hasNext()) {
                 JLabel next = faceLabels.get( (Integer) pathIterator.next());
                 //draw line from current to next
+                //g2d.setColor(colorGradient.get(colorIndex % colorGradient.size())); // rainbow
                 g2d.drawLine(current.getX()+(current.getWidth()/2),current.getY()+(current.getHeight()/2)
                             ,next.getX()+(current.getWidth()/2),next.getY()+(next.getHeight()/2)); 
                 //set  current to next
                 current  = next;
+                colorIndex++;
             } 
         }
     }

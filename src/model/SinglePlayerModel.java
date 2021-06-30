@@ -107,6 +107,9 @@ public class SinglePlayerModel{
   //the inspected word in the answersview
   private String inspectedWord;
 
+  //rotation index { 0 - no rotation }
+  private int rotationIndex = 0;
+
 
 
   //this might not be necessary, but its currently
@@ -144,7 +147,7 @@ public class SinglePlayerModel{
 
     this.gameState = GameState.PREGAME;
     this.timed = true;
-    this.gameDuration = 60;
+    this.gameDuration = 180;
     this.time = this.gameDuration;
 
     //might group into gameState
@@ -330,12 +333,14 @@ public class SinglePlayerModel{
   //rotateLeft
   public void rotateLeft() {
     board.rotateLeft();
+    rotationIndex = rotationIndex - 1 % 3;
     fireModelChangeEvent();
   }
 
   //rotateRight 
   public void rotateRight() {
     board.rotateRight();
+    rotationIndex = rotationIndex + 1 % 3;
     fireModelChangeEvent();
   }
 
@@ -478,6 +483,10 @@ public class SinglePlayerModel{
 
   public Map<String,List<List<Integer>>> getSolution() {
     return solution;
+  }
+
+  public int getRotationIndex() {
+    return rotationIndex;
   }
 
   //pcl interface requirements
