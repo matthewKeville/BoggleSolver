@@ -21,125 +21,103 @@ public class MainMenuView extends JPanel{
 
   private Color gold = new Color(255,215,0);
  
-  private JComboBox gameModeBox; 
-  private JComboBox sizeBox;
-  private JCheckBox timedBox;
-  private JButton playButton;
+  private JButton singlePlayerButton;
+  private JButton multiPlayerButton;
+  private JButton settingsButton;
   
   public MainMenuView() {
     super();
     createAndShow(); 
   }
 
-  public JComboBox getGameModeBox() {
-    return gameModeBox;
-  }
-    
-  public JComboBox getSizeBox() {
-    return sizeBox;
-  }
-
-  public JCheckBox getTimedBox() {
-    return timedBox;
-  }
-    
-  public JButton getPlayButton() {
-    return playButton;
-  }
 
   private void createAndShow() {
     setLayout(new GridBagLayout());
     setBackground(gold);
     setOpaque(true);
-    //Game Mode Label
-    JLabel gameModeLabel = new JLabel("Game Mode : "); 
+
+    //Title
+    JLabel title = new JLabel("BOGGLE"); 
+    title.setFont(new Font("TimesRoman", Font.PLAIN, 30)); 
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.gridx=0;
     gbc.gridy=0;
     gbc.weightx = 1;
     gbc.weighty = 1;
-    gbc.anchor = GridBagConstraints.PAGE_START;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    add(gameModeLabel,gbc);
+    gbc.anchor = GridBagConstraints.CENTER;
+    //gbc.fill = GridBagConstraints.HORIZONTAL;
+    add(title,gbc);
 
-    //Game Mode Picker
-    String[] gameModes = {"Classic","Redux","Links"};
-    gameModeBox = new JComboBox(gameModes);
-    gameModeBox.setSelectedIndex(0);
-    gbc = new GridBagConstraints();
-    gbc.gridx=1;
-    gbc.gridy=0;
-    gbc.weightx = 1;
-    gbc.weighty = 1;
-    gbc.anchor = GridBagConstraints.PAGE_START;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    add(gameModeBox,gbc);
+    JPanel buttonPanel = new JPanel();
+    buttonPanel.setLayout(new BoxLayout(buttonPanel,BoxLayout.Y_AXIS));
 
+    //Single Player Button
+    singlePlayerButton = new JButton("Single Player");
+
+    singlePlayerButton.setMaximumSize(new Dimension(200,20));
+    singlePlayerButton.setPreferredSize(new Dimension(200,20));
+
+    //add(singlePlayerButton,gbc);
+    buttonPanel.add(singlePlayerButton);
+
+
+    //Multi Player Button
+    multiPlayerButton = new JButton("Multi Player");
+    multiPlayerButton.setMaximumSize(new Dimension(200,20));
+    multiPlayerButton.setPreferredSize(new Dimension(200,20));
+    buttonPanel.add(multiPlayerButton);
+
+   
+    //Settings Button
+    settingsButton = new JButton("Settings");
     
-    //Size Label
-    JLabel sizeLabel = new JLabel("Game Size : "); 
+    settingsButton.setMaximumSize(new Dimension(200,20));
+    settingsButton.setPreferredSize(new Dimension(200,20));
+    buttonPanel.add(settingsButton);
+    
+   
+ 
     gbc = new GridBagConstraints();
     gbc.gridx=0;
     gbc.gridy=1;
     gbc.weightx = 1;
     gbc.weighty = 1;
-    gbc.anchor = GridBagConstraints.PAGE_START;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    add(sizeLabel,gbc);
+    gbc.anchor = GridBagConstraints.CENTER;
+    add(buttonPanel,gbc);
 
-    //Size Picker
-    String[] sizes = {"4","5","6","7","8","9","10"};
-    sizeBox = new JComboBox(sizes);
-    sizeBox.setSelectedIndex(0);
-    gbc = new GridBagConstraints();
-    gbc.gridx=1;
-    gbc.gridy=1;
-    gbc.weightx = 1;
-    gbc.weighty = 1;
-    gbc.anchor = GridBagConstraints.PAGE_START;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    add(sizeBox,gbc);
 
-    //timed checkbox
-    timedBox = new JCheckBox(" Timed ? ");
-    timedBox.setSelected(true);
-    gbc = new GridBagConstraints();
-    gbc.gridx=0;
-    gbc.gridy=2;
-    gbc.weightx = 1;
-    gbc.weighty = 1;
-    gbc.anchor = GridBagConstraints.PAGE_START;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    add(timedBox,gbc);
-
-    //Play Button
-    playButton = new JButton("Play");
-    gbc = new GridBagConstraints();
-    gbc.gridx=0;
-    gbc.gridy=3;
-    gbc.weightx = 1;
-    gbc.weighty = 1;
-    gbc.anchor = GridBagConstraints.PAGE_START;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    add(playButton,gbc);
-    
+ 
     }
 
-    public void addSizeBoxListener(ActionListener sizeListener) {
-        sizeBox.addActionListener(sizeListener);
+
+    public JButton getSinglePlayerButton() {
+        return singlePlayerButton;
     }
 
-    public void addGameModeBoxListener(ActionListener gameModeListener) {
-        gameModeBox.addActionListener(gameModeListener);
+    public JButton getmultiPlayerButton() {
+        return multiPlayerButton;
     }
 
-    public void addTimedBoxListener(ActionListener timedListener) {
-        timedBox.addActionListener(timedListener);
+    public JButton getSettingsButton() {
+        return settingsButton;
     }
 
-    public void addPlayButtonListener(ActionListener playListener) 
+
+    public void addSinglePlayerButtonListener(ActionListener singlePlayerListener) 
     {
-       playButton.addActionListener(playListener); 
+       singlePlayerButton.addActionListener(singlePlayerListener); 
+    }
+
+    
+    public void addMultiPlayerButtonListener(ActionListener multiPlayerListener) 
+    {
+       multiPlayerButton.addActionListener(multiPlayerListener); 
+    }
+
+
+    public void addSettingsButtonListener(ActionListener settingsListener) 
+    {
+       settingsButton.addActionListener(settingsListener); 
     }
 
 

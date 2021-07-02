@@ -22,9 +22,7 @@ src/model/audio/VolumeClipEvent.java
 src/model/audio/Playable.java
 src/model/audio/Audio.java
 
-src/model/BoggleModel.java
 src/model/SinglePlayerModel.java
-src/model/MainMenuModel.java
 src/model/ModelChangeEvent.java
 src/model/ModelChangeListener.java
 
@@ -35,12 +33,10 @@ src/view/AnswerInputView.java
 src/view/TimerView.java
 src/view/MainMenuView.java
 src/view/SinglePlayerView.java
+src/view/SinglePlayerMenuView.java
 src/view/SinglePlayerViewModel.java
-src/view/BoggleView.java
 
 src/controller/SinglePlayerController.java
-src/controller/MainMenuController.java
-src/controller/BoggleController.java
 src/controller/GameWarden.java
 src/controller/AudioPlayer.java
 
