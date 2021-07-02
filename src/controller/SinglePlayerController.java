@@ -59,9 +59,14 @@ public class SinglePlayerController implements ModelChangeListener {  //implemen
     this.spvm = getViewModel();
     this.audioListeners = new ArrayList();
 
-
-
     updateViews();
+   
+
+
+    ///////////////////////// 
+    //Game View Strategy  //
+    ////////////////////////
+
 
     //Add audio sources
 
@@ -72,7 +77,7 @@ public class SinglePlayerController implements ModelChangeListener {  //implemen
     // use the GameMenu Controller to update it's model
     // use the GameMenu Controller to update it's view (response Label)
 
-    spv.getAnswerInputView().addNewWordListener(new ActionListener()
+    spv.getGameView().getAnswerInputView().addNewWordListener(new ActionListener()
     {
         //adjust to adhere to answer constraints in the model
         //  Warning! Response output is not cohesive with the model
@@ -81,9 +86,9 @@ public class SinglePlayerController implements ModelChangeListener {  //implemen
         //  or dictate how differnt word lengths should be processed
         public void actionPerformed(ActionEvent e)
         {
-            String newWord = spv.getAnswerInputView().getAnswerField().getText(); 
+            String newWord = spv.getGameView().getAnswerInputView().getAnswerField().getText(); 
             //empty the answer field
-            spv.getAnswerInputView().getAnswerField().setText("");
+            spv.getGameView().getAnswerInputView().getAnswerField().setText("");
             if (newWord != null) {
                 SinglePlayerModel.AnswerGrade answerGrade = spm.addAnswerAttempt(newWord);
                 switch (answerGrade) {
@@ -112,7 +117,7 @@ public class SinglePlayerController implements ModelChangeListener {  //implemen
         }
     });
 
-   spv.getGameMenuView().addShakeListener(new ActionListener() 
+   spv.getGameView().getGameMenuView().addShakeListener(new ActionListener() 
     {
         public void actionPerformed(ActionEvent e)
         {
@@ -122,7 +127,7 @@ public class SinglePlayerController implements ModelChangeListener {  //implemen
         }
     }); 
 
-    spv.getGameMenuView().addRotateLeftListener(new ActionListener() 
+    spv.getGameView().getGameMenuView().addRotateLeftListener(new ActionListener() 
     {
         public void actionPerformed(ActionEvent e)
         {
@@ -132,7 +137,7 @@ public class SinglePlayerController implements ModelChangeListener {  //implemen
         }
     }); 
 
-    spv.getGameMenuView().addRotateRightListener(new ActionListener() 
+    spv.getGameView().getGameMenuView().addRotateRightListener(new ActionListener() 
     {
         public void actionPerformed(ActionEvent e)
         {
@@ -142,7 +147,7 @@ public class SinglePlayerController implements ModelChangeListener {  //implemen
         }
     });
 
-    spv.getGameMenuView().addExitGameListener(new ActionListener()
+    spv.getGameView().getGameMenuView().addExitGameListener(new ActionListener()
     {
         public void actionPerformed(ActionEvent e) 
         {
@@ -151,7 +156,7 @@ public class SinglePlayerController implements ModelChangeListener {  //implemen
         }
     });
 
-    spv.getBoardView().addPlayListener(new ActionListener() 
+    spv.getGameView().getBoardView().addPlayListener(new ActionListener() 
     {
         public void actionPerformed(ActionEvent e)
         {
@@ -160,7 +165,7 @@ public class SinglePlayerController implements ModelChangeListener {  //implemen
         }
     });
 
-    spv.getGameMenuView().addEndListener(new ActionListener() 
+    spv.getGameView().getGameMenuView().addEndListener(new ActionListener() 
     {
         public void actionPerformed(ActionEvent e)
         {
@@ -170,7 +175,7 @@ public class SinglePlayerController implements ModelChangeListener {  //implemen
     });
 
     //these are firing twice ... wth
-    spv.getAnswerView().addAndSetSelectedListener(new ListSelectionListener() 
+    spv.getGameView().getAnswerView().addAndSetSelectedListener(new ListSelectionListener() 
     {
         public void valueChanged(ListSelectionEvent e) {
             JList firedFrom = (JList) e.getSource();
@@ -180,6 +185,57 @@ public class SinglePlayerController implements ModelChangeListener {  //implemen
         }
 
     });
+
+    spv.getGameView().getGameMenuView().addSettingsListener(new ActionListener() 
+    {
+        public void actionPerformed(ActionEvent e) 
+        {
+            ((CardLayout) spv.getLayout()).show(spv,SinglePlayerView.MENUVIEW);    
+        }
+    });
+
+    ///////////////////////
+    //Menu View Strategy//
+    /////////////////////
+
+    spv.getMenuView().addSizeBoxListener(new ActionListener() 
+    {
+        public void actionPerformed(ActionEvent e)
+        {
+            int newSize = Integer.parseInt( spv.getMenuView().getSizeBox().getSelectedItem().toString()); 
+            spm.setSize(newSize);
+        }
+    });
+
+
+    spv.getMenuView().addGameModeBoxListener(new ActionListener() 
+    {
+        public void actionPerformed(ActionEvent e)
+        {
+            String newGameMode = spv.getMenuView().getGameModeBox().getSelectedItem().toString();
+            spm.setGameMode(newGameMode); 
+        }
+    });
+
+    
+    spv.getMenuView().addTimedBoxListener(new ActionListener() 
+    {
+        public void actionPerformed(ActionEvent e)
+        {
+            spm.setTimed(spv.getMenuView().getTimedBox().isSelected()); 
+        }
+    });
+
+
+    spv.getMenuView().addReturnListener(new ActionListener() 
+    {
+        public void actionPerformed(ActionEvent e)
+        {
+            ((CardLayout) spv.getLayout()).show(spv,SinglePlayerView.GAMEVIEW);    
+        }
+    });
+
+
             
 
   }
@@ -203,10 +259,10 @@ public class SinglePlayerController implements ModelChangeListener {  //implemen
   public void updateViews() {
     SinglePlayerViewModel oldModel = spvm;
     spvm = getViewModel();
-           spv.getBoardView().refresh(spvm);
-           spv.getAnswerView().refresh(spvm);            
-           spv.getAnswerInputView().refresh(spvm);
-           spv.getTimerView().refresh(spvm);
+           spv.getGameView().getBoardView().refresh(spvm);
+           spv.getGameView().getAnswerView().refresh(spvm);            
+           spv.getGameView().getAnswerInputView().refresh(spvm);
+           spv.getGameView().getTimerView().refresh(spvm);
            System.out.println("Game State: " + spvm.getGameState());
   }
 

@@ -22,8 +22,8 @@ public class Boggle extends JFrame {
     private MainMenuView mmv;
     private AudioPlayer audioPlayer;
 
-    private final String MAINMENUPANEL = "main_menu";
-    private final String SINGLEPLAYERPANEL = "single_player";
+    private static final String MAINMENUPANEL = "main_menu";
+    private static final String SINGLEPLAYERPANEL = "single_player";
 
     public Boggle() {
         super("Boggle");
@@ -79,7 +79,7 @@ public class Boggle extends JFrame {
         }); 
 
 
-        spv.getGameMenuView().addExitGameListener( new ActionListener() 
+        spv.getGameView().getGameMenuView().addExitGameListener( new ActionListener() 
         {   
             public void actionPerformed(ActionEvent e)  
             {

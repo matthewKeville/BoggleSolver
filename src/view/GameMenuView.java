@@ -28,6 +28,7 @@ public class GameMenuView extends JPanel {
   private JButton rightButton;//rotate
   private JButton shakeButton;//abandon current game
   private JButton endButton;//switch to the postgame state
+  private JButton settingsButton;
   private JButton exitGameButton;//return to the main menu
 
 
@@ -86,6 +87,18 @@ public class GameMenuView extends JPanel {
     gbc.anchor = GridBagConstraints.FIRST_LINE_START;
     this.add(endButton,gbc);
 
+    //settings
+    settingsButton = new JButton("settings");
+    gbc = new GridBagConstraints();
+    gbc.gridx = 1;
+    gbc.gridy = 1;
+    gbc.weightx =1;
+    gbc.weighty =1;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.anchor = GridBagConstraints.FIRST_LINE_START;
+    this.add(settingsButton,gbc);
+
+
     //exit to main menu
     exitGameButton = new JButton("Exit");
     gbc = new GridBagConstraints();
@@ -115,6 +128,10 @@ public class GameMenuView extends JPanel {
 
   public void addEndListener(ActionListener endListener) {
     endButton.addActionListener(endListener);
+  }
+
+  public void addSettingsListener(ActionListener settingsListener) {
+    settingsButton.addActionListener(settingsListener);
   }
     
   public void addExitGameListener(ActionListener quitListener) {

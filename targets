@@ -33,6 +33,7 @@ src/view/AnswerInputView.java
 src/view/TimerView.java
 src/view/MainMenuView.java
 src/view/SinglePlayerView.java
+src/view/SinglePlayerGameView.java
 src/view/SinglePlayerMenuView.java
 src/view/SinglePlayerViewModel.java
 

@@ -24,7 +24,7 @@ public class SinglePlayerMenuView extends JPanel{
   private JComboBox gameModeBox; 
   private JComboBox sizeBox;
   private JCheckBox timedBox;
-  private JButton playButton;
+  private JButton returnButton;
   
   public SinglePlayerMenuView() {
     super();
@@ -43,9 +43,6 @@ public class SinglePlayerMenuView extends JPanel{
     return timedBox;
   }
     
-  public JButton getPlayButton() {
-    return playButton;
-  }
 
   private void createAndShow() {
     setLayout(new GridBagLayout());
@@ -113,7 +110,7 @@ public class SinglePlayerMenuView extends JPanel{
     add(timedBox,gbc);
 
     //Play Button
-    playButton = new JButton("Play");
+    returnButton = new JButton("Return");
     gbc = new GridBagConstraints();
     gbc.gridx=0;
     gbc.gridy=3;
@@ -121,7 +118,7 @@ public class SinglePlayerMenuView extends JPanel{
     gbc.weighty = 1;
     gbc.anchor = GridBagConstraints.PAGE_START;
     gbc.fill = GridBagConstraints.HORIZONTAL;
-    add(playButton,gbc);
+    add(returnButton,gbc);
     
     }
 
@@ -137,9 +134,9 @@ public class SinglePlayerMenuView extends JPanel{
         timedBox.addActionListener(timedListener);
     }
 
-    public void addPlayButtonListener(ActionListener playListener) 
+    public void addReturnListener(ActionListener returnListener) 
     {
-       playButton.addActionListener(playListener); 
+       returnButton.addActionListener(returnListener); 
     }
 
 
