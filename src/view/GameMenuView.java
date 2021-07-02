@@ -36,9 +36,35 @@ public class GameMenuView extends JPanel {
     super();
     //this.setBackground(gold);
     this.setOpaque(false);
-    this.setPreferredSize(new Dimension(400,50));
+    this.setPreferredSize(new Dimension(400,100));
     this.setLayout(new GridBagLayout());
     create();
+  }
+
+  //some buttons should only be enabled when certain game
+  //states are actualized
+  public void refresh(SinglePlayerViewModel spvm) {
+    switch(spvm.getGameState()) {
+        case PREGAME:
+            leftButton.setVisible(false);
+            rightButton.setVisible(false);
+            endButton.setVisible(false);
+            shakeButton.setVisible(false);
+            break;
+        case GAME:
+            leftButton.setVisible(true);
+            rightButton.setVisible(true);
+            endButton.setVisible(true);
+            exitGameButton.setVisible(false);
+            settingsButton.setVisible(false);
+            break;
+        case POSTGAME:
+            endButton.setVisible(false);
+            exitGameButton.setVisible(true);
+            settingsButton.setVisible(true);
+            shakeButton.setVisible(true);
+            break;
+    }
   }
 
   private void create() {
@@ -58,7 +84,7 @@ public class GameMenuView extends JPanel {
     //rotate right
     rightButton = new JButton("Rotate Right");
     gbc = new GridBagConstraints();
-    gbc.gridx = 1;
+    gbc.gridx = 2;
     gbc.gridy = 0;
     gbc.weightx =1;
     gbc.weighty =1;
@@ -68,7 +94,7 @@ public class GameMenuView extends JPanel {
     //shake
     shakeButton = new JButton("Shake");
     gbc = new GridBagConstraints();
-    gbc.gridx = 2;
+    gbc.gridx = 1;
     gbc.gridy = 0;
     gbc.weightx =1;
     gbc.weighty =1;
@@ -79,7 +105,7 @@ public class GameMenuView extends JPanel {
     //go to POSTGAME
     endButton = new JButton("End");
     gbc = new GridBagConstraints();
-    gbc.gridx = 0;
+    gbc.gridx = 1;
     gbc.gridy = 1;
     gbc.weightx =1;
     gbc.weighty =1;
@@ -90,8 +116,8 @@ public class GameMenuView extends JPanel {
     //settings
     settingsButton = new JButton("settings");
     gbc = new GridBagConstraints();
-    gbc.gridx = 1;
-    gbc.gridy = 1;
+    gbc.gridx = 0;
+    gbc.gridy = 2;
     gbc.weightx =1;
     gbc.weighty =1;
     gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -103,7 +129,7 @@ public class GameMenuView extends JPanel {
     exitGameButton = new JButton("Exit");
     gbc = new GridBagConstraints();
     gbc.gridx = 2;
-    gbc.gridy = 1;
+    gbc.gridy = 2;
     gbc.weightx =1;
     gbc.weighty =1;
     gbc.fill = GridBagConstraints.HORIZONTAL;

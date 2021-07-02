@@ -16,7 +16,7 @@ public class SinglePlayerViewModel {
     //BoardView
     //size can be inferred from boardFaces
     private List<String> faces;
-
+    private int rotationIndex;
     //AnswersView
     
     // user answers indexed by size
@@ -45,8 +45,9 @@ public class SinglePlayerViewModel {
     private SinglePlayerModel.GameState gameState;
 
 
-    public SinglePlayerViewModel(List<String> faces, Map<Integer,List<String>> userAnswersMap, String responseLabel,String inspectedWord,boolean timed, int time,SinglePlayerModel.GameState gameState,Map<Integer,List<String>> solutionMap,Map<String,List<List<Integer>>> solution) {
+    public SinglePlayerViewModel(List<String> faces,int rotationIndex, Map<Integer,List<String>> userAnswersMap, String responseLabel,String inspectedWord,boolean timed, int time,SinglePlayerModel.GameState gameState,Map<Integer,List<String>> solutionMap,Map<String,List<List<Integer>>> solution) {
         this.faces = faces;
+        this.rotationIndex  = rotationIndex;
         this.userAnswersMap = userAnswersMap;
         this.solutionMap = solutionMap;
         this.solution = solution;
@@ -60,6 +61,10 @@ public class SinglePlayerViewModel {
 
     public List<String> getFaces() {
         return faces;
+    }
+
+    public int getRotationIndex() {
+        return rotationIndex;
     }
 
     public Map<Integer,List<String>> getUserAnswersMap() {

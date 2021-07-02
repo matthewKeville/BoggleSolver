@@ -88,6 +88,9 @@ public class ClassicBoard extends Board {
                                             );
         List<String> dice = new ArrayList<String>();
         switch(size) {
+            case 3:
+                dice = extendedDice(size);
+                break;
             case 4:
                 dice = original;
                 break;
@@ -97,8 +100,8 @@ public class ClassicBoard extends Board {
             case 6:
                 break;
             default:
-                if (size < 4) {
-                    System.out.println("Error Boggle Boards must be atleast size 4");
+                if (size < 2) {
+                    System.out.println("Error Boggle Boards must be atleast size 3");
                 } else {
                     dice = extendedDice(size);
                 }

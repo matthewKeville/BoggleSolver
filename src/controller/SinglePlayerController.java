@@ -263,13 +263,14 @@ public class SinglePlayerController implements ModelChangeListener {  //implemen
            spv.getGameView().getAnswerView().refresh(spvm);            
            spv.getGameView().getAnswerInputView().refresh(spvm);
            spv.getGameView().getTimerView().refresh(spvm);
+           spv.getGameView().getGameMenuView().refresh(spvm);
            System.out.println("Game State: " + spvm.getGameState());
   }
 
   //Construct a view Model from the model
   public SinglePlayerViewModel getViewModel() {
     System.out.println(spm.getBoard() == null);
-    return new SinglePlayerViewModel(spm.getBoard().getFaces(),spm.getUserAnswersMap(),spm.getAnswerInputResponse(),spm.getInspectedWord(),
+    return new SinglePlayerViewModel(spm.getBoard().getFaces(),spm.getRotationIndex(),spm.getUserAnswersMap(),spm.getAnswerInputResponse(),spm.getInspectedWord(),
                 spm.isTimed(),spm.getTime(),spm.getGameState(),spm.getSolutionMap(),spm.getSolution());
   }
 

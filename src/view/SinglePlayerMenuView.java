@@ -85,7 +85,10 @@ public class SinglePlayerMenuView extends JPanel{
     add(sizeLabel,gbc);
 
     //Size Picker
-    String[] sizes = {"4","5","6","7","8","9","10"};
+                     //anything > 8 is dumb 
+                     //6 is broken as I don't have
+                     //the dice set
+    String[] sizes = {"3","4","5","7","8"};
     sizeBox = new JComboBox(sizes);
     sizeBox.setSelectedIndex(0);
     gbc = new GridBagConstraints();

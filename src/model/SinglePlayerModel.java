@@ -229,9 +229,25 @@ public class SinglePlayerModel{
   //External Control
   ////////////////////
 
-  //shake (new Game) 
+  //Discard all model variables relating to the game,
+  //set state to pregame
   public void shake() {
     System.out.println("board was shook");
+
+
+    //reset timer
+    timer.stop();
+    time = gameDuration;
+ 
+
+    //change game state to preGame
+    gameState = GameState.PREGAME;
+    //notify controller
+    fireModelChangeEvent();
+  }
+
+  //generate a new game
+  public void play() {
     //new board
     this.board = boardFactory.getInstance(size,gameMode);
     //new solve
@@ -241,17 +257,9 @@ public class SinglePlayerModel{
     answerInputResponse = "";
     inspectedWord = "";
     resetUserAnswersMap();
-    //reset timer
-    timer.stop();
-    time = gameDuration;
-    //change game state to preGame
-    gameState = GameState.PREGAME;
-    //notify controller
-    fireModelChangeEvent();
-  }
-
-  public void play() {
-    shake();
+    //reset rotation index
+    rotationIndex = 0;
+    
     if (timed) {
         startTimer();
     }
@@ -333,14 +341,18 @@ public class SinglePlayerModel{
   //rotateLeft
   public void rotateLeft() {
     board.rotateLeft();
-    rotationIndex = rotationIndex - 1 % 3;
+    rotationIndex = (rotationIndex + 1) % 4;
     fireModelChangeEvent();
   }
 
-  //rotateRight 
   public void rotateRight() {
     board.rotateRight();
-    rotationIndex = rotationIndex + 1 % 3;
+    //Java is dumb % is not modulus, its the remainder,
+    //so you can't expect -1 % 3 to return the proper answer : 1
+    rotationIndex = (rotationIndex - 1);
+    if (rotationIndex == -1) {
+        rotationIndex = 3;
+    }
     fireModelChangeEvent();
   }
 

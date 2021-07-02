@@ -168,6 +168,9 @@ public class BoardView extends JPanel {
 
     faceLabels.clear();
     List<String> faces = spvm.getFaces();
+    
+
+
     //set up container for labels
     //can't seem to find  a margin property , so
     //i will have the boardView JPanel nested inside a
@@ -229,7 +232,9 @@ public class BoardView extends JPanel {
         System.out.println(" inspected word : " + spvm.getInspectedWord() );
         if (!spvm.getInspectedWord().equals("")) {
             List<List<Integer>> paths = spvm.getSolution().get(spvm.getInspectedWord());
-            graphPath = paths.get(0); 
+            //rotate the path before graphing it
+            System.out.println("rotation index is " + spvm.getRotationIndex());
+            graphPath = rotatePath(spvm.getRotationIndex(),paths.get(0));
             System.out.println("graph path");
             System.out.println(graphPath);
             wordGraph.repaint();
@@ -240,6 +245,65 @@ public class BoardView extends JPanel {
 
     
   }
+
+  //unoptimal, but it works
+  private List<Integer> rotatePath(int rotationIndex , List<Integer> path) {
+
+    //each board has i innner layers, in which we make 4 substitutions
+    // there are size // 2 inner layers with more than 1 element
+    //those we swap the 4 sides for as many inner layers as there are
+    //we load each side into a buffer and then swap
+    // integer division is the number of inner layers that need to rotate
+        int size = ((int) Math.sqrt(faceLabels.size()));
+        List<Integer> orientation = new ArrayList(faceLabels.size());
+        //construct default orientation
+        for (int i = 0; i < faceLabels.size(); i++) {
+            orientation.add(i);
+        }
+
+        ///////////////////////////////////////////////////////////////////
+        //this should be called as many times as the rotation index warrants
+        ////////////////////////////////////////////////////////////////////
+        
+        for ( int r = 0; r < rotationIndex; r++) {
+        //rotate the orientation one right turn
+
+                int innerRotations = size /  2;  
+                int[] swapNorth = new int[size];
+                int[] swapEast = new int[size];
+                int[] swapSouth = new int[size];
+                int[] swapWest = new int[size];
+
+                //for each layer
+                for (int i=0; i < innerRotations; i++) {
+                    //fill swap buffer
+                    for (int k=0; k < size-(i*2); k++) {
+                        swapNorth[k] = orientation.get(i+(i*size)+k);
+                        swapEast[k] = orientation.get( (size-1)*(i+1)+size*k );
+                        swapSouth[k] = orientation.get( (size-i)*size-(1+i)-k);
+                        swapWest[k] =  orientation.get( (size-1)*(size-i)-(size*k));
+
+                    }
+
+                   for (int k=0; k < size-(i*2); k++) {
+                        orientation.set((size-1)*(i+1)+size*k,swapNorth[k]); //put North in East
+                        orientation.set( (size-i)*size-(1+i)-k,swapEast[k]); //put East in South
+                        orientation.set( (size-1)*(size-i)-(size*k),swapSouth[k]); //put South in West     
+                        orientation.set(i+(i*size)+k,swapWest[k]);
+                    }    
+                }
+        }
+
+
+        List<Integer> rotatedPath = new ArrayList(path.size());
+        for (Integer x : path) {
+            rotatedPath.add(orientation.get(x));
+        }
+        return rotatedPath;
+
+
+  }
+
 
   public void addPlayListener(ActionListener playListener) {
     playButton.addActionListener(playListener);
